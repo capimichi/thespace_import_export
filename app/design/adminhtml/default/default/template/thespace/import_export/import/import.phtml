@@ -2,8 +2,8 @@
 <link rel="stylesheet" href="https://cdn.jsdelivr.net/gh/vadimsva/waitMe/waitMe.min.css"/>
 <script src="https://cdn.jsdelivr.net/gh/vadimsva/waitMe/waitMe.min.js"></script>
 
-<h2>Upload prodotti</h2>
-<form id="import_form" method="post" enctype="multipart/form-data">
+<h2>Caricamento prodotti</h2>
+<form id="import_form_product_upload" method="post" enctype="multipart/form-data">
     <input name="form_key" type="hidden" value="<?php echo Mage::getSingleton('core/session')->getFormKey() ?>"/>
 
     <label>
@@ -11,8 +11,11 @@
         <input type="file" name="file">
     </label>
 
-    <input type="submit" value="Importa">
+    <input type="submit" value="Carica file">
 </form>
+<p></p>
+
+
 <p></p>
 <p></p>
 <br>

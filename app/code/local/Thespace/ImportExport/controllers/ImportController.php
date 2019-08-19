@@ -16,6 +16,60 @@ class Thespace_ImportExport_ImportController extends Mage_Adminhtml_Controller_A
         $this->renderLayout();
     }
     
+    public function ajaximportparseAction()
+    {
+        header('Content-Type: application/json');
+        $response = [
+            'status' => 'OK',
+            'errors' => [],
+        ];
+        
+        if (isset($_FILES['file'])) {
+            $filePath = $_FILES['file']['tmp_name'];
+            
+            $importDirectory = implode(DIRECTORY_SEPARATOR, [
+                    \Mage::getBaseDir('media'),
+                    "thespace-import-export",
+                ]) . DIRECTORY_SEPARATOR;
+            
+            $canCreateImportDirectory = true;
+            if (!file_exists($importDirectory)) {
+                $canCreateImportDirectory = mkdir($importDirectory, 0777, true);
+            }
+            
+            if ($canCreateImportDirectory) {
+                $importFile = $importDirectory . implode("-", [
+                        date("Y-m-d-H-i-s"),
+                        str_replace(" ", "", $_FILES['file']['name']),
+                    ]);
+                
+                if (is_writable($importFile)) {
+                    copy($filePath, $importFile);
+                    
+                    $response['file'] = $filePath;
+                } else {
+                    $response['errors'][] = sprintf("Cannot write import file '%s'", $importFile);
+                }
+            } else {
+                $response['errors'][] = sprintf("Cannot create import directory '%s'", $importDirectory);
+            }
+        } else {
+            $response['errors'][] = '$_FILES is not set';
+        }
+        
+        echo json_encode($response);
+        die();
+    }
+    
+    public function ajaximportcheckAction()
+    {
+        header('Content-Type: application/json');
+        $response = [
+            'status' => 'OK',
+            'errors' => [],
+        ];
+    }
+    
     public function ajaximportAction()
     {
         header('Content-Type: application/json');
@@ -87,9 +141,9 @@ class Thespace_ImportExport_ImportController extends Mage_Adminhtml_Controller_A
                             'line'    => $exception->getLine(),
                         ];
                     }
-    
+                    
                     Mage::helper('thespaceimportexport/ProductRow')->translateproduct($product, $row);
-
+                    
                     $rows[] = $product->getId();
                 }
                 $response['products'] = $rows;
@@ -219,7 +273,7 @@ class Thespace_ImportExport_ImportController extends Mage_Adminhtml_Controller_A
             if (!file_exists($responseFileDir)) {
                 mkdir($responseFileDir, 0777, true);
             }
-    
+            
             $d = new DateTime('now', new DateTimeZone('Europe/San_Marino'));
             
             $filename = implode("-", [
