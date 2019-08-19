@@ -80,11 +80,14 @@ class Thespace_ImportExport_ImportController extends Mage_Adminhtml_Controller_A
         
         $filePath = $_POST['file'];
         
+        $index = 0;
         $rowIndex = 1;
+    
+        $missingHeaderRows = $productParserHelper->getMissingHeadersInRows($csvHelper->getRows($filePath));
         
         foreach ($csvHelper->getRows($filePath) as $row) {
             
-            $missingHeaders = $productParserHelper->getMissingHeadersInRow($row);
+            $missingHeaders = $missingHeaderRows[$index];
             
             if (count($missingHeaders)) {
                 $error = [
@@ -94,7 +97,8 @@ class Thespace_ImportExport_ImportController extends Mage_Adminhtml_Controller_A
                 
                 $response['errors'][] = $error;
             }
-            
+    
+            $index++;
             $rowIndex++;
         }
         
