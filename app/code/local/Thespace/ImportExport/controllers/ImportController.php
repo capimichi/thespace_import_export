@@ -76,7 +76,7 @@ class Thespace_ImportExport_ImportController extends Mage_Adminhtml_Controller_A
         ];
         
         $csvHelper = Mage::helper('thespaceimportexport/Csv');
-        $productParserHelper = Mage::helper('thespaceimportexport/ProductRow');
+        $productParserHelper = Mage::helper('thespaceimportexport/ProductParser');
         
         $filePath = $_POST['file'];
         
