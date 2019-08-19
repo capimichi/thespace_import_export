@@ -4,6 +4,9 @@
     <modules>
         <Thespace_ImportExport>
             <version>0.1.0</version>
+            <depends>
+                <AvS_FastSimpleImport/>
+            </depends>
         </Thespace_ImportExport>
     </modules>
 
