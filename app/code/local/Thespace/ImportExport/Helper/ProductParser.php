@@ -25,7 +25,7 @@ class Thespace_ImportExport_Helper_ProductParser extends Mage_Core_Helper_Abstra
         'weight_type',
     ];
     
-    const CONFIGURABLE_HEADERS_PARENT               = [
+    const CONFIGURABLE_HEADERS_PARENT = [
         'parent',
         'genitore',
     ];
@@ -202,6 +202,70 @@ class Thespace_ImportExport_Helper_ProductParser extends Mage_Core_Helper_Abstra
         }
         
         return $datas;
+    }
+    
+    /**
+     * @author Michele Capicchioni <capimichi@gmail.com>
+     *
+     * @param $dataItems
+     *
+     * @return array
+     */
+    public function applyParentCells($dataItems)
+    {
+        $parentChildren = [];
+        
+        foreach ($dataItems as $dataItem) {
+            
+            $parentSku = null;
+            foreach (self::CONFIGURABLE_HEADERS_PARENT as $headerParent) {
+                if (!empty($dataItem[$headerParent])) {
+                    $parentSku = $dataItem[$headerParent];
+                }
+            }
+            
+            if ($parentSku) {
+                if (!isset($parentChildren[$parentChildren])) {
+                    $parentChildren[$parentSku] = [];
+                }
+                
+                $parentChildren[$parentSku][] = $dataItem;
+            }
+        }
+        
+        for ($i = 0; $i < count($dataItems); $i++) {
+            $dataItem = $dataItems[$i];
+            $sku = $dataItem['sku'];
+            
+            $variationAttributeCodes = [];
+            foreach (self::CONFIGURABLE_HEADERS_VARIATION_ATTRIBUTES as $headerVariationAttributes) {
+                if (!empty($dataItem[$headerVariationAttributes])) {
+                    $variationAttributeCodes = explode('|', $dataItem[$headerVariationAttributes]);
+                }
+            }
+            
+            
+            if (isset($parentChildren[$sku])) {
+                $dataItem['_super_products_sku'] = [];
+                $dataItem['_super_attribute_code'] = [];
+                $dataItem['_super_attribute_option'] = [];
+                
+                foreach ($parentChildren[$sku] as $child) {
+                    $childSku = $child['sku'];
+                    
+                    foreach ($variationAttributeCodes as $variationAttributeCode) {
+                        
+                        $dataItem['_super_products_sku'][] = $childSku;
+                        $dataItem['_super_attribute_code'][] = $variationAttributeCode;
+                        $dataItem['_super_attribute_option'][] = isset($child[$variationAttributeCode]) ? $child[$variationAttributeCode] : null;
+                    }
+                }
+            }
+            
+            $dataItems[$i] = $dataItem;
+        }
+        
+        return $dataItems;
     }
     
     /**

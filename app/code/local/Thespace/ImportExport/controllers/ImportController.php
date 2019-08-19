@@ -124,12 +124,42 @@ class Thespace_ImportExport_ImportController extends Mage_Adminhtml_Controller_A
         $filePath = $_POST['file'];
         
         $dataItems = $productParserHelper->getDataFromRows($csvHelper->getRows($filePath));
+        $dataItems = $productParserHelper->applyParentCells($dataItems);
+        
+        $confItems = [];
+        $simpleItems = [];
+        $dataGroups = [];
+        
+        foreach ($dataItems as $dataItem) {
+            if (isset($dataItem['_type']) && $dataItem['_type'] == 'configurable') {
+                $confItems[] = $dataItem;
+            } else {
+                $simpleItems[] = $dataItem;
+            }
+        }
+        
+        foreach (array_chunk($simpleItems, 500) as $simpleItemGroup) {
+            $dataGroups[] = $simpleItemGroup;
+        }
+        
+        foreach (array_chunk($confItems, 500) as $confItemGroup) {
+            $dataGroups[] = $confItemGroup;
+        }
         
         $import = Mage::getModel('fastsimpleimport/import');
-        try {
-            $import->processProductImport($dataItems);
-        } catch (Exception $e) {
-            $response['errors'] = $import->getErrorMessages();
+        
+        $index = 0;
+        foreach ($dataGroups as $dataGroup) {
+            try {
+                $import->processProductImport($dataGroup);
+            } catch (Exception $e) {
+                $error = [
+                    'group'  => $index,
+                    'errors' => $import->getErrorMessages(),
+                ];
+                $response['errors'][] = $error;
+            }
+            $index++;
         }
         
         
