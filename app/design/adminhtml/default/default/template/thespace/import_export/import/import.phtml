@@ -11,10 +11,41 @@
         <input type="file" name="file">
     </label>
 
-    <input type="submit" value="Carica file">
+    <input type="submit" value="Seleziona file">
 </form>
 <p></p>
 
+<form id="import_form_product_import" method="post">
+    <input name="form_key" type="hidden" value="<?php echo Mage::getSingleton('core/session')->getFormKey() ?>"/>
+    <input id="import_form_product_import_file" name="file" type="hidden" value=""/>
+
+    <input type="submit" value="Seleziona file">
+</form>
+<p></p>
+
+<script>
+    jQuery(function () {
+    
+        jQuery("#import_form_product_upload").on("submit", function (e) {
+
+            var formData = new FormData(this);
+            
+            jQuery.ajax({
+                url: '<?php echo Mage::helper("adminhtml")->getUrl("csvimportexport/import/ajaximport"); ?>',
+                method: 'post',
+                data: formData,
+                success: function (response) {
+                    console.log(response);
+                },
+                error: function (response) {
+                
+                }
+            });
+            
+            e.preventDefault();
+        });
+    });
+</script>
 
 <p></p>
 <p></p>
