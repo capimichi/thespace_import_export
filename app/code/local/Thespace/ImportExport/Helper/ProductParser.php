@@ -145,10 +145,10 @@ class Thespace_ImportExport_Helper_ProductParser extends Mage_Core_Helper_Abstra
                 
                 foreach ($attributes as $attribute) {
                     $isRequired = intval($attribute->getData('is_required'));
+                    $attributeCode = $attribute->getData('attribute_code');
 //                    $isUserDefined = intval($attribute->getData('is_user_defined'));
                     
-                    if ($isRequired) {
-                        $attributeCode = $attribute->getData('attribute_code');
+                    if ($isRequired && !in_array($attributeCode, self::NOT_REQUIRED_HEADERS)) {
                         if (!isset($data[$attributeCode])) {
                             $missingHeaders[] = $attributeCode;
                         }
