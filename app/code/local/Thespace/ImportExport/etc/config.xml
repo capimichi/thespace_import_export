@@ -1,0 +1,67 @@
+<?xml version="1.0"?>
+
+<config>
+    <modules>
+        <Thespace_ImportExport>
+            <version>0.1.0</version>
+        </Thespace_ImportExport>
+    </modules>
+
+
+    <global>
+        <helpers>
+            <thespaceimportexport>
+                <class>Thespace_ImportExport_Helper</class>
+            </thespaceimportexport>
+        </helpers>
+    </global>
+
+    <admin>
+        <routers>
+            <thespaceimportexport>
+                <use>admin</use>
+                <args>
+                    <module>Thespace_ImportExport</module>
+                    <frontName>thespaceimportexport</frontName>
+                </args>
+            </thespaceimportexport>
+        </routers>
+    </admin>
+
+    <adminhtml>
+        <menu>
+            <menu1 translate="title" module="ImportExport">
+                <title>TS Imp/Exp</title>
+                <sort_order>60</sort_order>
+                <children>
+                    <menuitem1 module="ImportExport">
+                        <title>Import</title>
+                        <action>thespaceimportexport/import</action>
+                    </menuitem1>
+                    <menuitem2 module="ImportExport">
+                        <title>Export</title>
+                        <action>thespaceimportexport/export</action>
+                    </menuitem2>
+                </children>
+            </menu1>
+        </menu>
+        <!--<acl>-->
+        <!--<resources>-->
+        <!--<admin>-->
+        <!--<children>-->
+        <!--<menu1 translate="title" module="ImportExport">-->
+        <!--<title>CM ImportExport</title>-->
+        <!--<sort_order>60</sort_order>-->
+        <!--<children>-->
+        <!--<menuitem1>-->
+        <!--<title>Import</title>-->
+        <!--</menuitem1>-->
+        <!--</children>-->
+        <!--</menu1>-->
+        <!--</children>-->
+        <!--</admin>-->
+        <!--</resources>-->
+        <!--</acl>-->
+    </adminhtml>
+
+</config>

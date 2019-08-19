@@ -1,0 +1,146 @@
+<script src="https://code.jquery.com/jquery-3.3.1.min.js"></script>
+<link rel="stylesheet" href="https://cdn.jsdelivr.net/gh/vadimsva/waitMe/waitMe.min.css"/>
+<script src="https://cdn.jsdelivr.net/gh/vadimsva/waitMe/waitMe.min.js"></script>
+
+<h2>Upload prodotti</h2>
+<form id="import_form" method="post" enctype="multipart/form-data">
+    <input name="form_key" type="hidden" value="<?php echo Mage::getSingleton('core/session')->getFormKey() ?>"/>
+
+    <label>
+        Import
+        <input type="file" name="file">
+    </label>
+
+    <input type="submit" value="Importa">
+</form>
+<p></p>
+<p></p>
+<br>
+<h2>Upload categorie</h2>
+<form id="import_categories_form" method="post" enctype="multipart/form-data">
+    <input name="form_key" type="hidden" value="<?php echo Mage::getSingleton('core/session')->getFormKey() ?>"/>
+
+    <label>
+        Import categorie
+        <input type="file" name="file">
+    </label>
+
+    <input type="submit" value="Importa categorie">
+
+    <a id="import_categories_url" style="display: none;" href="#">Scarica associazione SKU / ID</a>
+</form>
+<p></p>
+<p></p>
+<br>
+<h2>Upload immagini</h2>
+<form id="import_images_form" method="post" enctype="multipart/form-data">
+    <input name="form_key" type="hidden" value="<?php echo Mage::getSingleton('core/session')->getFormKey() ?>"/>
+
+    <label>
+        Import Immagini
+        <input type="file" name="file[]" multiple="multiple">
+    </label>
+
+    <input type="submit" value="Importa immagini">
+</form>
+
+
+<script>
+    $j = jQuery.noConflict();
+
+    $j(function () {
+
+        var $form = $j("#import_form");
+        $form.on("submit", function (e) {
+            var formData = new FormData(this);
+            $j("body").waitMe({
+                effect: 'pulse',
+                text: 'Import...',
+                bg: 'rgba(51,51,51,0.8)',
+                color: '#ffffff'
+            });
+
+
+            $j.ajax({
+                url: "<?php echo Mage::helper("adminhtml")->getUrl("csvimportexport/import/ajaximport"); ?>",
+                type: 'POST',
+                data: formData,
+                success: function (response) {
+                    console.log(response);
+                    $j("body").waitMe("hide");
+                },
+                error: function (request, status, error) {
+                    $j("body").waitMe("hide");
+                },
+                cache: false,
+                contentType: false,
+                processData: false
+            });
+            e.preventDefault();
+        });
+
+        var $formCategories = $j("#import_categories_form");
+        $formCategories.on("submit", function (e) {
+            var formData = new FormData(this);
+            $j("body").waitMe({
+                effect: 'pulse',
+                text: 'Import...',
+                bg: 'rgba(51,51,51,0.8)',
+                color: '#ffffff'
+            });
+
+
+            $j.ajax({
+                url: "<?php echo Mage::helper("adminhtml")->getUrl("csvimportexport/import/ajaximportcategories"); ?>",
+                type: 'POST',
+                data: formData,
+                success: function (response) {
+                    console.log(response);
+                    var $a = jQuery("#import_categories_url");
+                    if (response.category_association_url) {
+                        $a.attr('href', response.category_association_url);
+                        $a.fadeIn(0);
+                    }
+                    $j("body").waitMe("hide");
+                },
+                error: function (request, status, error) {
+                    $j("body").waitMe("hide");
+                },
+                cache: false,
+                contentType: false,
+                processData: false
+            });
+            e.preventDefault();
+        });
+
+        var $formImages = $j("#import_images_form");
+        $formImages.on("submit", function (e) {
+            var formData = new FormData(this);
+            $j("body").waitMe({
+                effect: 'pulse',
+                text: 'Import...',
+                bg: 'rgba(51,51,51,0.8)',
+                color: '#ffffff'
+            });
+
+
+            $j.ajax({
+                url: "<?php echo Mage::helper("adminhtml")->getUrl("csvimportexport/import/ajaximportimages"); ?>",
+                type: 'POST',
+                data: formData,
+                success: function (response) {
+                    console.log(response);
+                    $j("body").waitMe("hide");
+                },
+                error: function (request, status, error) {
+                    $j("body").waitMe("hide");
+                },
+                cache: false,
+                contentType: false,
+                processData: false
+            });
+            e.preventDefault();
+        });
+    });
+
+</script>
