@@ -85,6 +85,7 @@
 
                     var errorTable = $j("#import_table_product_errors");
                     errorTable.find("tbody").html('');
+                    errorTable.fadeIn(0);
 
                     if (response.errors.length) {
                         var rowTemplate = errorTable.data('template-row');
