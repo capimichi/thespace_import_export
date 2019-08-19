@@ -50,12 +50,15 @@ class Thespace_ImportExport_ImportController extends Mage_Adminhtml_Controller_A
                     
                     $response['file'] = $importFile;
                 } else {
+                    $response['status'] = 'ERROR';
                     $response['errors'][] = sprintf("Cannot write import file '%s'", $importFile);
                 }
             } else {
+                $response['status'] = 'ERROR';
                 $response['errors'][] = sprintf("Cannot create import directory '%s'", $importDirectory);
             }
         } else {
+            $response['status'] = 'ERROR';
             $response['errors'][] = '$_FILES is not set';
         }
         
