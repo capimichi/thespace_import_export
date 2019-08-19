@@ -108,8 +108,45 @@ class Thespace_ImportExport_ImportController extends Mage_Adminhtml_Controller_A
         
         echo json_encode($response);
         die();
+    }
+    
+    public function ajaximportrunAction()
+    {
+        header('Content-Type: application/json');
+        $response = [
+            'status' => 'OK',
+            'errors' => [],
+        ];
         
+        $csvHelper = Mage::helper('thespaceimportexport/Csv');
+        $productParserHelper = Mage::helper('thespaceimportexport/ProductParser');
         
+        $filePath = $_POST['file'];
+        
+        $index = 0;
+        $rowIndex = 1;
+    
+        $dataItems = [];
+    
+        foreach ($csvHelper->getRows($filePath) as $row) {
+            
+            $dataItem = $productParserHelper->getDataFromRow($row);
+            $dataItems[] = $dataItem;
+            
+            $index++;
+            $rowIndex++;
+        }
+    
+    
+        $import = Mage::getModel('fastsimpleimport/import');
+        try {
+            $import->processProductImport($dataItems);
+        } catch (Exception $e) {
+        }
+    
+    
+        echo json_encode($response);
+        die();
     }
     
     public function ajaximportAction()
