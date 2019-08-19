@@ -84,7 +84,7 @@ class Thespace_ImportExport_ImportController extends Mage_Adminhtml_Controller_A
         
         foreach ($csvHelper->getRows($filePath) as $row) {
             
-            $rowLine = sprintf("Missing columns on row '%s': %s", implode(", ", $rowIndex, $productParserHelper->getMissingHeadersInRow($row)));
+            $rowLine = sprintf("Missing columns on row '%s': %s", $rowIndex, implode(", ", $productParserHelper->getMissingHeadersInRow($row)));
             
             $response['errors'][] = $rowLine;
         }
