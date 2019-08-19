@@ -13,20 +13,20 @@ class Thespace_ImportExport_Helper_ProductParser extends Mage_Core_Helper_Abstra
     ];
     
     const HEADER_ASSOCIATIONS = [
-        'name'           => [
+        'name'              => [
             'name',
             'nome',
         ],
-        'sku'            => [
+        'sku'               => [
             'sku',
             'riferimento',
         ],
-        '_type'          => [
+        '_type'             => [
             'tipo',
             'tipologia',
             'type',
         ],
-        '_attribute_set' => [
+        '_attribute_set'    => [
             'set',
             'set_attributi',
             'attributi_set',
@@ -120,14 +120,23 @@ class Thespace_ImportExport_Helper_ProductParser extends Mage_Core_Helper_Abstra
                         $missingHeaders[] = $requiredHeader;
                     }
                 }
-    
+                
                 $attributes = Mage::getResourceModel('catalog/product_attribute_collection')
                     ->getItems();
                 
-                foreach ($attributes as $attribute){
-                    $a = 1;
+                foreach ($attributes as $attribute) {
+                    $isRequired = intval($attribute->getData('is_required'));
+                    $isUserDefined = intval($attribute->getData('is_user_defined'));
+                    
+                    if ($isRequired && $isUserDefined) {
+                        
+                        $attributeCode = $attribute->getData('attribute_code');
+                        if (!isset($data[$attributeCode])) {
+                            $missingHeaders[] = $attributeCode;
+                        }
+                    }
                 }
-    
+                
             }
         }
         
