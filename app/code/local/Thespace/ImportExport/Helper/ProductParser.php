@@ -156,29 +156,29 @@ class Thespace_ImportExport_Helper_ProductParser extends Mage_Core_Helper_Abstra
     public function getMissingHeadersInRows($rows)
     {
         $missingHeadersRows = [];
-    
+        
         $attributes = Mage::getResourceModel('catalog/product_attribute_collection')
             ->getItems();
         
         foreach ($rows as $row){
             $data = $this->getDataFromRow($row);
-    
+            
             $missingHeaders = [];
-    
+            
             foreach (self::REQUIRED_HEADERS as $requiredHeader) {
                 if (!isset($data[$requiredHeader])) {
                     $missingHeaders[] = $requiredHeader;
                 }
             }
-    
-            if (isset($data['sku'])) {
-        
-                $sku = $data['sku'];
-        
-                $product = \Mage::getModel('catalog/product')->loadByAttribute('sku', $sku);
-        
-                if (!$product) {
             
+            if (isset($data['sku'])) {
+                
+                $sku = $data['sku'];
+                
+                $product = \Mage::getModel('catalog/product')->loadByAttribute('sku', $sku);
+                
+                if (!$product) {
+                    
                     foreach (self::REQUIRED_NEW_PRODUCT_HEADERS as $requiredHeader) {
                         if (!isset($data[$requiredHeader])) {
                             $missingHeaders[] = $requiredHeader;
@@ -188,18 +188,20 @@ class Thespace_ImportExport_Helper_ProductParser extends Mage_Core_Helper_Abstra
                     foreach ($attributes as $attribute) {
                         $isRequired = intval($attribute->getData('is_required'));
                         $isUserDefined = intval($attribute->getData('is_user_defined'));
-                
+                        
                         if ($isRequired && $isUserDefined) {
-                    
+                            
                             $attributeCode = $attribute->getData('attribute_code');
                             if (!isset($data[$attributeCode])) {
                                 $missingHeaders[] = $attributeCode;
                             }
                         }
                     }
-            
+                    
                 }
             }
+            
+            $missingHeadersRows[] = $missingHeaders;
         }
         
         return $missingHeadersRows;
