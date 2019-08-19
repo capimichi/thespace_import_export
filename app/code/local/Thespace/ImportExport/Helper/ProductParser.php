@@ -79,6 +79,9 @@ class Thespace_ImportExport_Helper_ProductParser extends Mage_Core_Helper_Abstra
             'visibility',
             'visibilita',
         ],
+        '{attribute_code}'  => [
+            'att_{attribute_code}',
+        ],
     ];
 
 //    const TYPE_KEY                    = "tipo";
@@ -108,11 +111,17 @@ class Thespace_ImportExport_Helper_ProductParser extends Mage_Core_Helper_Abstra
      * @author Michele Capicchioni <capimichi@gmail.com>
      *
      * @param $row
+     * @param $attributes
      *
      * @return array
      */
-    public function getDataFromRow($row)
+    public function getDataFromRow($row, $attributes = null)
     {
+        if (is_null($attributes)) {
+            $attributes = Mage::getResourceModel('catalog/product_attribute_collection')
+                ->getItems();
+        }
+        
         $data = [];
         foreach (self::HEADER_ASSOCIATIONS as $magentoKey => $headerNames) {
             if (!is_array($headerNames)) {
@@ -125,6 +134,22 @@ class Thespace_ImportExport_Helper_ProductParser extends Mage_Core_Helper_Abstra
                 if (isset($row[$headerName])) {
                     $data[$magentoKey] = $row[$headerName];
                 }
+                
+                if(preg_match("/{attribute_code}/is", $magentoKey)){
+                    
+                    foreach ($attributes as $attribute){
+                        $attributeCode = $attribute->getData('attribute_code');
+                        if(!empty($attributeCode)){
+                            $parsedMagentoKey = str_replace("{attribute_code}", $attributeCode, $magentoKey);
+                            $parsedHeaderName = str_replace("{attribute_code}", $attributeCode, $headerName);
+                            
+                            if (isset($row[$parsedHeaderName])) {
+                                $data[$parsedMagentoKey] = $row[$parsedHeaderName];
+                            }
+                        }
+                    }
+                }
+                
             }
         }
         
@@ -141,6 +166,11 @@ class Thespace_ImportExport_Helper_ProductParser extends Mage_Core_Helper_Abstra
      */
     public function getMissingHeadersInRow($row, $attributes = null)
     {
+        if (is_null($attributes)) {
+            $attributes = Mage::getResourceModel('catalog/product_attribute_collection')
+                ->getItems();
+        }
+        
         $data = $this->getDataFromRow($row);
         
         $missingHeaders = [];
@@ -163,11 +193,6 @@ class Thespace_ImportExport_Helper_ProductParser extends Mage_Core_Helper_Abstra
                     if (!isset($data[$requiredHeader])) {
                         $missingHeaders[] = $requiredHeader;
                     }
-                }
-                
-                if (is_null($attributes)) {
-                    $attributes = Mage::getResourceModel('catalog/product_attribute_collection')
-                        ->getItems();
                 }
                 
                 foreach ($attributes as $attribute) {
