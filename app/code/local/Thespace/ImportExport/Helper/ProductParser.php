@@ -9,6 +9,7 @@ class Thespace_ImportExport_Helper_ProductParser extends Mage_Core_Helper_Abstra
     const REQUIRED_NEW_PRODUCT_HEADERS = [
         '_type',
         '_attribute_set',
+        '_product_websites',
     ];
     
     const HEADER_ASSOCIATIONS = [
@@ -31,6 +32,9 @@ class Thespace_ImportExport_Helper_ProductParser extends Mage_Core_Helper_Abstra
             'attributi_set',
             'attribute_set',
             'set_attribute',
+        ],
+        '_product_websites' => [
+            'website',
         ],
     ];
 
@@ -116,6 +120,14 @@ class Thespace_ImportExport_Helper_ProductParser extends Mage_Core_Helper_Abstra
                         $missingHeaders[] = $requiredHeader;
                     }
                 }
+    
+                $attributes = Mage::getResourceModel('catalog/product_attribute_collection')
+                    ->getItems();
+                
+                foreach ($attributes as $attribute){
+                    $a = 1;
+                }
+    
             }
         }
         
