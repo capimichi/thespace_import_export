@@ -1,0 +1,10 @@
+{
+  "name": "capimichi/thespace_import_export",
+  "description": "Magento 1 import / export",
+  "type": "magento-module",
+  "authors": [
+    {
+      "name": "Michele Capicchioni"
+    }
+  ]
+}
