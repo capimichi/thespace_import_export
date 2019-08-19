@@ -25,22 +25,32 @@ class Thespace_ImportExport_Helper_ProductParser extends Mage_Core_Helper_Abstra
         'weight_type',
     ];
     
+    const CONFIGURABLE_HEADERS_PARENT               = [
+        'parent',
+        'genitore',
+    ];
+    
+    const CONFIGURABLE_HEADERS_VARIATION_ATTRIBUTES = [
+        'variation_attributes',
+        'attributi_variazioni',
+    ];
+    
     const HEADER_ASSOCIATIONS = [
-        'name'              => [
+        'name'                    => [
             'name',
             'nome',
         ],
-        'sku'               => [
+        'sku'                     => [
             'sku',
             'riferimento',
         ],
-        '_type'             => [
+        '_type'                   => [
             'tipo',
             'tipologia',
             'type',
             '_type',
         ],
-        '_attribute_set'    => [
+        '_attribute_set'          => [
             'set',
             'set_attributi',
             'attributi_set',
@@ -48,38 +58,54 @@ class Thespace_ImportExport_Helper_ProductParser extends Mage_Core_Helper_Abstra
             'set_attribute',
             '_attribute_set',
         ],
-        '_product_websites' => [
+        '_product_websites'       => [
             'website',
             '_product_websites',
         ],
-        'description'       => [
+        'description'             => [
             'description',
             'descrizione',
         ],
-        'short_description' => [
+        'short_description'       => [
             'short_description',
             'descrizione_breve',
         ],
-        'price'             => [
+        'price'                   => [
             'price',
             'prezzo',
         ],
-        'status'            => [
+        'status'                  => [
             'status',
             'stato',
             'abilitato',
             'enabled',
         ],
-        'tax_class_id'      => [
+        'qty'                     => [
+            'qty',
+            'quantita',
+            'quantità',
+        ],
+        'is_in_stock'             => [
+            'is_in_stock',
+            'disponibile',
+            'disponibilità',
+        ],
+        'manage_stock'            => [
+            'manage_stock',
+            'gestisci_scorte',
+            'gestisci_quantita',
+        ],
+        'use_config_manage_stock' => 'use_config_manage_stock',
+        'tax_class_id'            => [
             'tax_class_id',
             'classe_tassa',
             'tax_class',
         ],
-        'visibility'        => [
+        'visibility'              => [
             'visibility',
             'visibilita',
         ],
-        '{attribute_code}'  => [
+        '{attribute_code}'        => [
             'att_{attribute_code}',
         ],
     ];
@@ -170,7 +196,7 @@ class Thespace_ImportExport_Helper_ProductParser extends Mage_Core_Helper_Abstra
         
         $datas = [];
         
-        foreach ($rows as $row){
+        foreach ($rows as $row) {
             $data = $this->getDataFromRow($row, $attributes);
             $datas[] = $data;
         }
