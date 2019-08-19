@@ -93,6 +93,9 @@ class Thespace_ImportExport_ImportController extends Mage_Adminhtml_Controller_A
             $response['status'] = 'ERROR';
         }
         
+        echo json_encode($response);
+        die();
+        
     }
     
     public function ajaximportAction()
