@@ -290,7 +290,9 @@ class Thespace_ImportExport_Helper_ProductParser extends Mage_Core_Helper_Abstra
             
             $i = 0;
             do {
-                $parsedDataItem = [];
+                $parsedDataItem = [
+                    'sku' => null,
+                ];
                 
                 if (!$i) {
                     $parsedDataItem = array_merge($parsedDataItem, $dataItem);
