@@ -25,6 +25,7 @@ class Thespace_ImportExport_Helper_ProductParser extends Mage_Core_Helper_Abstra
             'tipo',
             'tipologia',
             'type',
+            '_type',
         ],
         '_attribute_set'    => [
             'set',
@@ -32,9 +33,11 @@ class Thespace_ImportExport_Helper_ProductParser extends Mage_Core_Helper_Abstra
             'attributi_set',
             'attribute_set',
             'set_attribute',
+            '_attribute_set',
         ],
         '_product_websites' => [
             'website',
+            '_product_websites',
         ],
     ];
 
