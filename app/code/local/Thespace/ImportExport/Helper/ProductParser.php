@@ -271,6 +271,54 @@ class Thespace_ImportExport_Helper_ProductParser extends Mage_Core_Helper_Abstra
     /**
      * @author Michele Capicchioni <capimichi@gmail.com>
      *
+     * @param $dataItems
+     *
+     * @return array
+     */
+    public function parseArrayCells($dataItems)
+    {
+        $parsedDataItems = [];
+        
+        foreach ($dataItems as $dataItem){
+            $arrayCells = [];
+            
+            foreach ($dataItem as $key => $value){
+                if(is_array($value)){
+                    $arrayCells[$key] = $value;
+                }
+            }
+            
+            $i = 0;
+            do{
+                $parsedDataItem = [];
+                
+                if(!$i){
+                    $parsedDataItem = array_merge($parsedDataItem, $dataItem);
+                }
+                
+                foreach ($arrayCells as $key => $arrayCell){
+                    $parsedDataItem[$key] = array_shift($arrayCell);
+                }
+                
+                $parsedDataItems[] = $parsedDataItem;
+                
+                $hasMoreItems = false;
+                foreach ($arrayCells as $arrayCell){
+                    if(count($arrayCell)){
+                        $hasMoreItems = true;
+                    }
+                }
+                
+                $i++;
+            } while($hasMoreItems);
+        }
+        
+        return $parsedDataItems;
+    }
+    
+    /**
+     * @author Michele Capicchioni <capimichi@gmail.com>
+     *
      * @param      $row
      * @param null $attributes
      *

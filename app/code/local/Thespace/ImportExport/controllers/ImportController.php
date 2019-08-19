@@ -150,6 +150,9 @@ class Thespace_ImportExport_ImportController extends Mage_Adminhtml_Controller_A
         
         $index = 0;
         foreach ($dataGroups as $dataGroup) {
+    
+            $dataGroup = $productParserHelper->parseArrayCells($dataGroup);
+            
             try {
                 $import->processProductImport($dataGroup);
             } catch (Exception $e) {
