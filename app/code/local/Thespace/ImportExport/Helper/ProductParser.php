@@ -12,6 +12,19 @@ class Thespace_ImportExport_Helper_ProductParser extends Mage_Core_Helper_Abstra
         '_product_websites',
     ];
     
+    const NOT_REQUIRED_HEADERS = [
+        'created_at',
+        'links_purchased_separately',
+        'links_title',
+        'price_type',
+        'price_view',
+        'samples_title',
+        'shipment_type',
+        'sku_type',
+        'updated_at',
+        'weight_type',
+    ];
+    
     const HEADER_ASSOCIATIONS = [
         'name'              => [
             'name',
@@ -129,9 +142,9 @@ class Thespace_ImportExport_Helper_ProductParser extends Mage_Core_Helper_Abstra
                 
                 foreach ($attributes as $attribute) {
                     $isRequired = intval($attribute->getData('is_required'));
-                    $isUserDefined = intval($attribute->getData('is_user_defined'));
+//                    $isUserDefined = intval($attribute->getData('is_user_defined'));
                     
-                    if ($isRequired && $isUserDefined) {
+                    if ($isRequired) {
                         
                         $attributeCode = $attribute->getData('attribute_code');
                         if (!isset($data[$attributeCode])) {
@@ -160,7 +173,7 @@ class Thespace_ImportExport_Helper_ProductParser extends Mage_Core_Helper_Abstra
         $attributes = Mage::getResourceModel('catalog/product_attribute_collection')
             ->getItems();
         
-        foreach ($rows as $row){
+        foreach ($rows as $row) {
             $data = $this->getDataFromRow($row);
             
             $missingHeaders = [];
@@ -187,9 +200,8 @@ class Thespace_ImportExport_Helper_ProductParser extends Mage_Core_Helper_Abstra
                     
                     foreach ($attributes as $attribute) {
                         $isRequired = intval($attribute->getData('is_required'));
-                        $isUserDefined = intval($attribute->getData('is_user_defined'));
                         
-                        if ($isRequired && $isUserDefined) {
+                        if ($isRequired) {
                             
                             $attributeCode = $attribute->getData('attribute_code');
                             if (!isset($data[$attributeCode])) {
