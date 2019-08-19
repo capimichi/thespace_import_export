@@ -107,11 +107,12 @@ class Thespace_ImportExport_Helper_ProductParser extends Mage_Core_Helper_Abstra
     /**
      * @author Michele Capicchioni <capimichi@gmail.com>
      *
-     * @param $row
+     * @param      $row
+     * @param null $attributes
      *
      * @return array
      */
-    public function getMissingHeadersInRow($row)
+    public function getMissingHeadersInRow($row, $attributes = null)
     {
         $data = $this->getDataFromRow($row);
         
@@ -137,15 +138,16 @@ class Thespace_ImportExport_Helper_ProductParser extends Mage_Core_Helper_Abstra
                     }
                 }
                 
-                $attributes = Mage::getResourceModel('catalog/product_attribute_collection')
-                    ->getItems();
+                if (is_null($attributes)) {
+                    $attributes = Mage::getResourceModel('catalog/product_attribute_collection')
+                        ->getItems();
+                }
                 
                 foreach ($attributes as $attribute) {
                     $isRequired = intval($attribute->getData('is_required'));
 //                    $isUserDefined = intval($attribute->getData('is_user_defined'));
                     
                     if ($isRequired) {
-                        
                         $attributeCode = $attribute->getData('attribute_code');
                         if (!isset($data[$attributeCode])) {
                             $missingHeaders[] = $attributeCode;
@@ -174,44 +176,7 @@ class Thespace_ImportExport_Helper_ProductParser extends Mage_Core_Helper_Abstra
             ->getItems();
         
         foreach ($rows as $row) {
-            $data = $this->getDataFromRow($row);
-            
-            $missingHeaders = [];
-            
-            foreach (self::REQUIRED_HEADERS as $requiredHeader) {
-                if (!isset($data[$requiredHeader])) {
-                    $missingHeaders[] = $requiredHeader;
-                }
-            }
-            
-            if (isset($data['sku'])) {
-                
-                $sku = $data['sku'];
-                
-                $product = \Mage::getModel('catalog/product')->loadByAttribute('sku', $sku);
-                
-                if (!$product) {
-                    
-                    foreach (self::REQUIRED_NEW_PRODUCT_HEADERS as $requiredHeader) {
-                        if (!isset($data[$requiredHeader])) {
-                            $missingHeaders[] = $requiredHeader;
-                        }
-                    }
-                    
-                    foreach ($attributes as $attribute) {
-                        $isRequired = intval($attribute->getData('is_required'));
-                        
-                        if ($isRequired) {
-                            
-                            $attributeCode = $attribute->getData('attribute_code');
-                            if (!isset($data[$attributeCode])) {
-                                $missingHeaders[] = $attributeCode;
-                            }
-                        }
-                    }
-                    
-                }
-            }
+            $missingHeaders = $this->getMissingHeadersInRow($row, $attributes);
             
             $missingHeadersRows[] = $missingHeaders;
         }
