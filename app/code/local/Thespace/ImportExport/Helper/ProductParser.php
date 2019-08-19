@@ -228,15 +228,10 @@ class Thespace_ImportExport_Helper_ProductParser extends Mage_Core_Helper_Abstra
         
         foreach ($dataItems as $dataItem) {
             
-            $parentSku = null;
-            foreach (self::CONFIGURABLE_HEADERS_PARENT as $headerParent) {
-                if (!empty($dataItem[$headerParent])) {
-                    $parentSku = $dataItem[$headerParent];
-                }
-            }
+            $parentSku = !empty($dataItem['parent']) ? $dataItem['parent'] : null;
             
             if ($parentSku) {
-                if (!isset($parentChildren[$parentChildren])) {
+                if (!isset($parentChildren[$parentSku])) {
                     $parentChildren[$parentSku] = [];
                 }
                 
@@ -248,13 +243,7 @@ class Thespace_ImportExport_Helper_ProductParser extends Mage_Core_Helper_Abstra
             $dataItem = $dataItems[$i];
             $sku = $dataItem['sku'];
             
-            $variationAttributeCodes = [];
-            foreach (self::CONFIGURABLE_HEADERS_VARIATION_ATTRIBUTES as $headerVariationAttributes) {
-                if (!empty($dataItem[$headerVariationAttributes])) {
-                    $variationAttributeCodes = explode('|', $dataItem[$headerVariationAttributes]);
-                }
-            }
-            
+            $variationAttributeCodes = explode('|', $dataItem['variation_attributes']);
             
             if (isset($parentChildren[$sku])) {
                 $dataItem['_super_products_sku'] = [];
