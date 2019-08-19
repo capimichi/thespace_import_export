@@ -52,6 +52,33 @@ class Thespace_ImportExport_Helper_ProductParser extends Mage_Core_Helper_Abstra
             'website',
             '_product_websites',
         ],
+        'description'       => [
+            'description',
+            'descrizione',
+        ],
+        'short_description' => [
+            'short_description',
+            'descrizione_breve',
+        ],
+        'price'             => [
+            'price',
+            'prezzo',
+        ],
+        'status'            => [
+            'status',
+            'stato',
+            'abilitato',
+            'enabled',
+        ],
+        'tax_class_id'      => [
+            'tax_class_id',
+            'classe_tassa',
+            'tax_class',
+        ],
+        'visibility'        => [
+            'visibility',
+            'visibilita',
+        ],
     ];
 
 //    const TYPE_KEY                    = "tipo";
