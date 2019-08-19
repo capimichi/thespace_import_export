@@ -39,16 +39,16 @@ class Thespace_ImportExport_ImportController extends Mage_Adminhtml_Controller_A
             
             if ($canCreateImportDirectory) {
                 
+                $importFile = $importDirectory . implode("-", [
+                        date("Y-m-d-H-i-s"),
+                        str_replace(" ", "", $_FILES['file']['name']),
+                    ]);
+                
                 if (is_writable($importDirectory)) {
-                    
-                    $importFile = $importDirectory . implode("-", [
-                            date("Y-m-d-H-i-s"),
-                            str_replace(" ", "", $_FILES['file']['name']),
-                        ]);
                     
                     copy($filePath, $importFile);
                     
-                    $response['file'] = $filePath;
+                    $response['file'] = $importFile;
                 } else {
                     $response['errors'][] = sprintf("Cannot write import file '%s'", $importFile);
                 }
