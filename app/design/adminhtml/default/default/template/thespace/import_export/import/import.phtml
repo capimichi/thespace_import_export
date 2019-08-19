@@ -34,7 +34,7 @@
             var formData = new FormData(this);
 
             $j.ajax({
-                url: '<?php echo Mage::helper("adminhtml")->getUrl("csvimportexport/import/ajaximport"); ?>',
+                url: '<?php echo Mage::helper("adminhtml")->getUrl("thespaceimportexport/import/ajaximport"); ?>',
                 method: 'post',
                 data: formData,
                 processData: false,
