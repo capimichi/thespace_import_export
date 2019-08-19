@@ -36,8 +36,8 @@ class Thespace_ImportExport_Helper_ProductParser extends Mage_Core_Helper_Abstra
     ];
     
     const HEADER_HELPER_ASSOCIATIONS = [
-        'parent'                => self::CONFIGURABLE_HEADERS_PARENT,
-        'variation_attributess' => self::CONFIGURABLE_HEADERS_VARIATION_ATTRIBUTES,
+        'parent'               => self::CONFIGURABLE_HEADERS_PARENT,
+        'variation_attributes' => self::CONFIGURABLE_HEADERS_VARIATION_ATTRIBUTES,
     ];
     
     const HEADER_ASSOCIATIONS = [
