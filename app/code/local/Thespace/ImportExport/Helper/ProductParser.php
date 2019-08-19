@@ -135,11 +135,11 @@ class Thespace_ImportExport_Helper_ProductParser extends Mage_Core_Helper_Abstra
                     $data[$magentoKey] = $row[$headerName];
                 }
                 
-                if(preg_match("/{attribute_code}/is", $magentoKey)){
+                if (preg_match("/{attribute_code}/is", $magentoKey)) {
                     
-                    foreach ($attributes as $attribute){
+                    foreach ($attributes as $attribute) {
                         $attributeCode = $attribute->getData('attribute_code');
-                        if(!empty($attributeCode)){
+                        if (!empty($attributeCode)) {
                             $parsedMagentoKey = str_replace("{attribute_code}", $attributeCode, $magentoKey);
                             $parsedHeaderName = str_replace("{attribute_code}", $attributeCode, $headerName);
                             
@@ -154,6 +154,28 @@ class Thespace_ImportExport_Helper_ProductParser extends Mage_Core_Helper_Abstra
         }
         
         return $data;
+    }
+    
+    /**
+     * @author Michele Capicchioni <capimichi@gmail.com>
+     *
+     * @param $rows
+     *
+     * @return array
+     */
+    public function getDataFromRows($rows)
+    {
+        $attributes = Mage::getResourceModel('catalog/product_attribute_collection')
+            ->getItems();
+        
+        $datas = [];
+        
+        foreach ($rows as $row){
+            $data = $this->getDataFromRow($row, $attributes);
+            $datas[] = $data;
+        }
+        
+        return $datas;
     }
     
     /**

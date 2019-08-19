@@ -82,7 +82,7 @@ class Thespace_ImportExport_ImportController extends Mage_Adminhtml_Controller_A
         
         $index = 0;
         $rowIndex = 1;
-    
+        
         $missingHeaderRows = $productParserHelper->getMissingHeadersInRows($csvHelper->getRows($filePath));
         
         foreach ($csvHelper->getRows($filePath) as $row) {
@@ -97,7 +97,7 @@ class Thespace_ImportExport_ImportController extends Mage_Adminhtml_Controller_A
                 
                 $response['errors'][] = $error;
             }
-    
+            
             $index++;
             $rowIndex++;
         }
@@ -123,28 +123,15 @@ class Thespace_ImportExport_ImportController extends Mage_Adminhtml_Controller_A
         
         $filePath = $_POST['file'];
         
-        $index = 0;
-        $rowIndex = 1;
-    
-        $dataItems = [];
-    
-        foreach ($csvHelper->getRows($filePath) as $row) {
-            
-            $dataItem = $productParserHelper->getDataFromRow($row);
-            $dataItems[] = $dataItem;
-            
-            $index++;
-            $rowIndex++;
-        }
-    
-    
+        $dataItems = $productParserHelper->getDataFromRows($csvHelper->getRows($filePath));
+        
         $import = Mage::getModel('fastsimpleimport/import');
         try {
             $import->processProductImport($dataItems);
         } catch (Exception $e) {
         }
-    
-    
+        
+        
         echo json_encode($response);
         die();
     }
