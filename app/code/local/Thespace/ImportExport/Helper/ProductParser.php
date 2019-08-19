@@ -3,7 +3,7 @@
 class Thespace_ImportExport_Helper_ProductParser extends Mage_Core_Helper_Abstract
 {
     const REQUIRED_HEADERS = [
-        'sku'
+        'sku',
     ];
     
     const REQUIRED_NEW_PRODUCT_HEADERS = [
@@ -12,15 +12,15 @@ class Thespace_ImportExport_Helper_ProductParser extends Mage_Core_Helper_Abstra
     ];
     
     const HEADER_ASSOCIATIONS = [
-        'name' => [
+        'name'           => [
             'name',
             'nome',
         ],
-        'sku' => [
+        'sku'            => [
             'sku',
             'riferimento',
         ],
-        '_type' => [
+        '_type'          => [
             'tipo',
             'tipologia',
             'type',
@@ -31,30 +31,96 @@ class Thespace_ImportExport_Helper_ProductParser extends Mage_Core_Helper_Abstra
             'attributi_set',
             'attribute_set',
             'set_attribute',
-        ]
+        ],
     ];
+
+//    const TYPE_KEY                    = "tipo";
+//    const TITLE_KEY                   = "titolo";
+//    const SKU_KEY                     = "riferimento";
+//    const NEW_SKU_KEY                 = "nuovo riferimento";
+//    const STATUS_KEY                  = "attivo";
+//    const WEIGHT_KEY                  = "peso";
+//    const HEIGHT_KEY                  = "altezza";
+//    const TAX_CLASS_KEY               = "tassa";
+//    const VISIBILITY_KEY              = "visibilita";
+//    const DESCRIPTION_KEY             = "descrizione";
+//    const SHORT_DESCRIPTION_KEY       = "descrizione_breve";
+//    const PRICE_KEY                   = "prezzo";
+//    const SPECIAL_PRICE_KEY           = "prezzo_speciale";
+//    const CATEGORY_KEY                = "categoria";
+//    const ATTRIBUTE_SET_KEY           = "set_attributi";
+//    const META_TITLE_KEY              = "meta_titolo";
+//    const META_DESCRIPTION_KEY        = "meta_descrizione";
+//    const PARENT_SKU_KEY              = "genitore";
+//    const CONFIGURABLE_ATTRIBUTES_KEY = "attributi_variazioni";
+//    const TRANSLATE_TITLE_KEY         = "titolo_{langkey}";
+//    const TRANSLATE_DESCRIPTION_KEY   = "descrizione_{langkey}";
     
-    const TYPE_KEY                    = "tipo";
-    const TITLE_KEY                   = "titolo";
-    const SKU_KEY                     = "riferimento";
-    const NEW_SKU_KEY                 = "nuovo riferimento";
-    const STATUS_KEY                  = "attivo";
-    const WEIGHT_KEY                  = "peso";
-    const HEIGHT_KEY                  = "altezza";
-    const TAX_CLASS_KEY               = "tassa";
-    const VISIBILITY_KEY              = "visibilita";
-    const DESCRIPTION_KEY             = "descrizione";
-    const SHORT_DESCRIPTION_KEY       = "descrizione_breve";
-    const PRICE_KEY                   = "prezzo";
-    const SPECIAL_PRICE_KEY           = "prezzo_speciale";
-    const CATEGORY_KEY                = "categoria";
-    const ATTRIBUTE_SET_KEY           = "set_attributi";
-    const META_TITLE_KEY              = "meta_titolo";
-    const META_DESCRIPTION_KEY        = "meta_descrizione";
-    const PARENT_SKU_KEY              = "genitore";
-    const CONFIGURABLE_ATTRIBUTES_KEY = "attributi_variazioni";
-    const TRANSLATE_TITLE_KEY         = "titolo_{langkey}";
-    const TRANSLATE_DESCRIPTION_KEY   = "descrizione_{langkey}";
+    
+    /**
+     * @author Michele Capicchioni <capimichi@gmail.com>
+     *
+     * @param $row
+     *
+     * @return array
+     */
+    public function getDataFromRow($row)
+    {
+        $data = [];
+        foreach (self::HEADER_ASSOCIATIONS as $magentoKey => $headerNames) {
+            if (!is_array($headerNames)) {
+                $headerNames = [
+                    $headerNames,
+                ];
+            }
+            
+            foreach ($headerNames as $headerName) {
+                if (isset($row[$headerName])) {
+                    $data[$magentoKey] = $row[$headerName];
+                }
+            }
+        }
+        
+        return $data;
+    }
+    
+    /**
+     * @author Michele Capicchioni <capimichi@gmail.com>
+     *
+     * @param $row
+     *
+     * @return array
+     */
+    public function getMissingHeadersInRow($row)
+    {
+        $data = $this->getDataFromRow($row);
+        
+        $missingHeaders = [];
+        
+        foreach (self::REQUIRED_HEADERS as $requiredHeader) {
+            if (!isset($data[$requiredHeader])) {
+                $missingHeaders[] = $requiredHeader;
+            }
+        }
+        
+        if (isset($data['sku'])) {
+            
+            $sku = $data['sku'];
+            
+            $product = \Mage::getModel('catalog/product')->loadByAttribute('sku', $sku);
+            
+            if (!$product) {
+                
+                foreach (self::REQUIRED_NEW_PRODUCT_HEADERS as $requiredHeader) {
+                    if (!isset($data[$requiredHeader])) {
+                        $missingHeaders[] = $requiredHeader;
+                    }
+                }
+            }
+        }
+        
+        return $missingHeaders;
+    }
     
     /**
      * @param $row

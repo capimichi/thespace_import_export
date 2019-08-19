@@ -55,5 +55,27 @@
 
             e.preventDefault();
         });
+
+        $j("#import_form_product_import").on("submit", function (e) {
+
+            var formData = new FormData(this);
+
+            $j.ajax({
+                url: '<?php echo Mage::helper("adminhtml")->getUrl("thespaceimportexport/import/ajaximportcheck"); ?>',
+                method: 'post',
+                data: formData,
+                processData: false,
+                cache: false,
+                contentType: false,
+                success: function (response) {
+                    console.log(response);
+                },
+                error: function (response) {
+
+                }
+            });
+
+            e.preventDefault();
+        });
     });
 </script>
