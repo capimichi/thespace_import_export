@@ -49,6 +49,7 @@ class Thespace_ImportExport_ImportController extends Mage_Adminhtml_Controller_A
                     copy($filePath, $importFile);
                     
                     $response['file'] = $importFile;
+                    $response['rows_count'] = count(file($importFile));
                 } else {
                     $response['status'] = 'ERROR';
                     $response['errors'][] = sprintf("Cannot write import file '%s'", $importFile);
@@ -73,6 +74,8 @@ class Thespace_ImportExport_ImportController extends Mage_Adminhtml_Controller_A
             'status' => 'OK',
             'errors' => [],
         ];
+        
+        $filePath = $_POST['file'];
     }
     
     public function ajaximportAction()
