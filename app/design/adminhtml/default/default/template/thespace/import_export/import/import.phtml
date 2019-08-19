@@ -45,8 +45,8 @@
                 cache: false,
                 contentType: false,
                 success: function (response) {
-                    console.log(response);
                     $j("#import_form_product_import").fadeIn(0);
+                    $j("#import_form_product_import_rows_count").html(response.rows_count);
                 },
                 error: function (response) {
 
