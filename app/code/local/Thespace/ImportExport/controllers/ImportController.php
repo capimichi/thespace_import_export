@@ -129,6 +129,7 @@ class Thespace_ImportExport_ImportController extends Mage_Adminhtml_Controller_A
         try {
             $import->processProductImport($dataItems);
         } catch (Exception $e) {
+            $response['errors'] = $import->getErrorMessages();
         }
         
         
