@@ -79,29 +79,33 @@ class Thespace_ImportExport_ImportController extends Mage_Adminhtml_Controller_A
         $productParserHelper = Mage::helper('thespaceimportexport/ProductParser');
         
         $filePath = $_POST['file'];
-    
+        
         $rowIndex = 1;
-    
+        
         foreach ($csvHelper->getRows($filePath) as $row) {
-        
-            $error = [
-                'row'     => $rowIndex,
-                'columns' => implode(", ", $productParserHelper->getMissingHeadersInRow($row)),
-            ];
-        
-            $response['errors'][] = $error;
-    
+            
+            $missingHeaders = $productParserHelper->getMissingHeadersInRow($row);
+            
+            if (count($missingHeaders)) {
+                $error = [
+                    'row'     => $rowIndex,
+                    'columns' => implode(", ", $missingHeaders),
+                ];
+                
+                $response['errors'][] = $error;
+            }
+            
             $rowIndex++;
         }
-    
+        
         if (count($response['errors'])) {
             $response['status'] = 'ERROR';
         }
-    
+        
         echo json_encode($response);
         die();
-    
-    
+        
+        
     }
     
     public function ajaximportAction()
