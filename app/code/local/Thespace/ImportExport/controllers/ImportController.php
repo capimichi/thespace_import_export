@@ -90,6 +90,8 @@ class Thespace_ImportExport_ImportController extends Mage_Adminhtml_Controller_A
             ];
         
             $response['errors'][] = $error;
+    
+            $rowIndex++;
         }
     
         if (count($response['errors'])) {
