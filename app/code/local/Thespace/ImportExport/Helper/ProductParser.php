@@ -35,6 +35,11 @@ class Thespace_ImportExport_Helper_ProductParser extends Mage_Core_Helper_Abstra
         'attributi_variazioni',
     ];
     
+    const HEADER_HELPER_ASSOCIATIONS = [
+        'parent'                => self::CONFIGURABLE_HEADERS_PARENT,
+        'variation_attributess' => self::CONFIGURABLE_HEADERS_VARIATION_ATTRIBUTES,
+    ];
+    
     const HEADER_ASSOCIATIONS = [
         'name'                    => [
             'name',
@@ -149,7 +154,13 @@ class Thespace_ImportExport_Helper_ProductParser extends Mage_Core_Helper_Abstra
         }
         
         $data = [];
-        foreach (self::HEADER_ASSOCIATIONS as $magentoKey => $headerNames) {
+        
+        $associations = array_merge(
+            self::HEADER_ASSOCIATIONS,
+            self::HEADER_HELPER_ASSOCIATIONS
+        );
+        
+        foreach ($associations as $magentoKey => $headerNames) {
             if (!is_array($headerNames)) {
                 $headerNames = [
                     $headerNames,
@@ -279,38 +290,38 @@ class Thespace_ImportExport_Helper_ProductParser extends Mage_Core_Helper_Abstra
     {
         $parsedDataItems = [];
         
-        foreach ($dataItems as $dataItem){
+        foreach ($dataItems as $dataItem) {
             $arrayCells = [];
             
-            foreach ($dataItem as $key => $value){
-                if(is_array($value)){
+            foreach ($dataItem as $key => $value) {
+                if (is_array($value)) {
                     $arrayCells[$key] = $value;
                 }
             }
             
             $i = 0;
-            do{
+            do {
                 $parsedDataItem = [];
                 
-                if(!$i){
+                if (!$i) {
                     $parsedDataItem = array_merge($parsedDataItem, $dataItem);
                 }
                 
-                foreach ($arrayCells as $key => $arrayCell){
+                foreach ($arrayCells as $key => $arrayCell) {
                     $parsedDataItem[$key] = array_shift($arrayCell);
                 }
                 
                 $parsedDataItems[] = $parsedDataItem;
                 
                 $hasMoreItems = false;
-                foreach ($arrayCells as $arrayCell){
-                    if(count($arrayCell)){
+                foreach ($arrayCells as $arrayCell) {
+                    if (count($arrayCell)) {
                         $hasMoreItems = true;
                     }
                 }
                 
                 $i++;
-            } while($hasMoreItems);
+            } while ($hasMoreItems);
         }
         
         return $parsedDataItems;
