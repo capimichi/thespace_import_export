@@ -36,17 +36,17 @@ class Thespace_ImportExport_Helper_ProductParser extends Mage_Core_Helper_Abstra
     ];
     
     const HEADER_IMAGE_ASSOCIATIONS = [
-        '_media_image'       => '_media_image',
+        '_media_image'        => '_media_image',
         '_media_attribute_id' => '_media_attribute_id',
-        '_media_is_disabled' => '_media_is_disabled',
-        '_media_position'    => '_media_position',
-        '_media_lable'       => '_media_lable',
-        'image'              => [
+        '_media_is_disabled'  => '_media_is_disabled',
+        '_media_position'     => '_media_position',
+        '_media_lable'        => '_media_lable',
+        'image'               => [
             'image',
             'images',
         ],
-        'small_image'        => 'small_image',
-        'thumbnail'          => 'thumbnail',
+        'small_image'         => 'small_image',
+        'thumbnail'           => 'thumbnail',
     ];
     
     const HEADER_HELPER_ASSOCIATIONS = [
@@ -303,7 +303,14 @@ class Thespace_ImportExport_Helper_ProductParser extends Mage_Core_Helper_Abstra
         for ($i = 0; $i < $dataItems; $i++) {
             $dataItem = $dataItems[$i];
             
-            if (isset($dataItem['image'])) {
+            $hasImage = false;
+            foreach (self::HEADER_IMAGE_ASSOCIATIONS as $key => $value) {
+                if (isset($dataItem[$key])) {
+                    $hasImage = true;
+                }
+            }
+            
+            if ($hasImage) {
                 
                 if ($options['advanced']) {
                     
@@ -322,9 +329,9 @@ class Thespace_ImportExport_Helper_ProductParser extends Mage_Core_Helper_Abstra
                             $hasImage = true;
                         }
                     }
-                    if($hasImage){
+                    if ($hasImage) {
                         $attributeIds = [];
-                        for($i = 0; $i < $maxCount; $i++){
+                        for ($i = 0; $i < $maxCount; $i++) {
                             $attributeIds[] = $options['media_attribute_id'];
                         }
                         $dataItem['_media_attribute_id'] = $attributeIds;
