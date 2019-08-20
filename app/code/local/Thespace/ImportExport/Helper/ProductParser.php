@@ -35,6 +35,19 @@ class Thespace_ImportExport_Helper_ProductParser extends Mage_Core_Helper_Abstra
         'attributi_variazioni',
     ];
     
+    const HEADER_IMAGE_ASSOCIATIONS = [
+        '_media_image'       => '_media_image',
+        '_media_is_disabled' => '_media_is_disabled',
+        '_media_position'    => '_media_position',
+        '_media_lable'       => '_media_lable',
+        'image'              => [
+            'image',
+            'images',
+        ],
+        'small_image'        => 'small_image',
+        'thumbnail'          => 'thumbnail',
+    ];
+    
     const HEADER_HELPER_ASSOCIATIONS = [
         'parent'               => self::CONFIGURABLE_HEADERS_PARENT,
         'variation_attributes' => self::CONFIGURABLE_HEADERS_VARIATION_ATTRIBUTES,
@@ -157,6 +170,7 @@ class Thespace_ImportExport_Helper_ProductParser extends Mage_Core_Helper_Abstra
         
         $associations = array_merge(
             self::HEADER_ASSOCIATIONS,
+            self::HEADER_IMAGE_ASSOCIATIONS,
             self::HEADER_HELPER_ASSOCIATIONS
         );
         
@@ -258,6 +272,82 @@ class Thespace_ImportExport_Helper_ProductParser extends Mage_Core_Helper_Abstra
                         $dataItem['_super_products_sku'][] = $childSku;
                         $dataItem['_super_attribute_code'][] = $variationAttributeCode;
                         $dataItem['_super_attribute_option'][] = isset($child[$variationAttributeCode]) ? $child[$variationAttributeCode] : null;
+                    }
+                }
+            }
+            
+            $dataItems[$i] = $dataItem;
+        }
+        
+        return $dataItems;
+    }
+    
+    /**
+     * @author Michele Capicchioni <capimichi@gmail.com>
+     *
+     * @param       $dataItems
+     * @param array $options
+     *
+     * @return mixed
+     */
+    public function applyImagesCells($dataItems, $options = [])
+    {
+        $options = array_merge([
+            'media_attribute_id' => Mage::getSingleton('catalog/product')->getResource()->getAttribute('media_gallery')->getAttributeId(),
+            'advanced'           => 0,
+        ], $options);
+        
+        $imageHelper = Mage::helper('thespaceimportexport/Image');
+        
+        for ($i = 0; $i < $dataItems; $i++) {
+            $dataItem = $dataItems[$i];
+            
+            if (isset($dataItem['image'])) {
+                
+                if ($options['advanced']) {
+                    
+                    foreach ($dataItem as $key => $value) {
+                        if (
+                            in_array($key, [
+                                '_media_image', '_media_is_disabled', '_media_position', '_media_lable', 'image', 'small_image', 'thumbnail',
+                            ])
+                            && !empty($value)
+                            && preg_match("/|/is", $value)
+                        ) {
+                            $dataItem[$key] = explode('|', $value);
+                        }
+                    }
+                } else {
+                    
+                    $imagePaths = explode("|", $dataItem['image']);
+                    
+                    $parsedSimpleData = [
+                        '_media_image'       => [],
+                        '_media_is_disabled' => [],
+                        '_media_position'    => [],
+                        '_media_lable'       => [],
+                        'image'              => '',
+                        'small_image'        => '',
+                        'thumbnail'          => '',
+                    ];
+                    
+                    $index = 0;
+                    foreach ($imagePaths as $imagePath) {
+                        
+                        $mediaPath = $imageHelper->storeImage($imagePath);
+                        if ($mediaPath) {
+                            $imageName = basename($mediaPath);
+                            
+                            $parsedSimpleData['_media_image'][] = $imageName;
+                            $parsedSimpleData['_media_is_disabled'][] = 0;
+                            $parsedSimpleData['_media_position'][] = $index;
+                            $parsedSimpleData['_media_lable'][] = $imageName;
+                            $parsedSimpleData['image'] = $imageName;
+                            $parsedSimpleData['small_image'] = $imageName;
+                            $parsedSimpleData['thumbnail'] = $imageName;
+                            
+                            $index++;
+                        }
                     }
                 }
             }
