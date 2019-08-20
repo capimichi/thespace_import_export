@@ -45,7 +45,24 @@ class Thespace_ImportExport_Helper_Image extends Mage_Core_Helper_Abstract
             $ext = pathinfo($tempImagePath, PATHINFO_EXTENSION);
             
             if (empty($ext)) {
-                $ext = 'png';
+                switch (true) {
+                    case preg_match("/\.png/is", $baseName):
+                        $ext = 'png';
+                        break;
+                    case preg_match("/\.jpg/is", $baseName):
+                    case preg_match("/\.jpeg/is", $baseName):
+                        $ext = 'jpg';
+                        break;
+                    case preg_match("/\.gif/is", $baseName):
+                        $ext = 'gif';
+                        break;
+                    case preg_match("/\.bmp/is", $baseName):
+                        $ext = 'gif';
+                        break;
+                    default:
+                        $ext = 'png';
+                        break;
+                }
             }
             
             $imageName = implode("-", [
