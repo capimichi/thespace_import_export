@@ -413,7 +413,7 @@ class Thespace_ImportExport_Helper_ProductParser extends Mage_Core_Helper_Abstra
                 }
                 
                 foreach ($arrayCells as $key => $arrayCell) {
-                    $parsedDataItem[$key] = array_shift($arrayCell);
+                    $parsedDataItem[$key] = array_shift($arrayCells[$key]);
                 }
                 
                 $parsedDataItems[] = $parsedDataItem;
