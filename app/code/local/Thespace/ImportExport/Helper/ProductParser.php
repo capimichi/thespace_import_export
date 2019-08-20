@@ -300,12 +300,12 @@ class Thespace_ImportExport_Helper_ProductParser extends Mage_Core_Helper_Abstra
         
         $imageHelper = Mage::helper('thespaceimportexport/Image');
         
-        for ($i = 0; $i < $dataItems; $i++) {
+        for ($i = 0; $i < count($dataItems); $i++) {
             $dataItem = $dataItems[$i];
             
             $hasImage = false;
             foreach (self::HEADER_IMAGE_ASSOCIATIONS as $key => $value) {
-                if (isset($dataItem[$key])) {
+                if (!empty($dataItem[$key])) {
                     $hasImage = true;
                 }
             }
