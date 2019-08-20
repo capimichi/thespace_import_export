@@ -125,6 +125,9 @@ class Thespace_ImportExport_ImportController extends Mage_Adminhtml_Controller_A
         
         $dataItems = $productParserHelper->getDataFromRows($csvHelper->getRows($filePath));
         $dataItems = $productParserHelper->applyParentCells($dataItems);
+        $dataItems = $productParserHelper->applyImagesCells($dataItems, [
+            'advanced' => 0
+        ]);
         
         $confItems = [];
         $simpleItems = [];
@@ -150,7 +153,7 @@ class Thespace_ImportExport_ImportController extends Mage_Adminhtml_Controller_A
         
         $index = 0;
         foreach ($dataGroups as $dataGroup) {
-    
+            
             $dataGroup = $productParserHelper->parseArrayCells($dataGroup);
             
             try {
