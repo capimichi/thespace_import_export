@@ -37,6 +37,7 @@ class Thespace_ImportExport_Helper_ProductParser extends Mage_Core_Helper_Abstra
     
     const HEADER_IMAGE_ASSOCIATIONS = [
         '_media_image'       => '_media_image',
+        '_media_attribute_id' => '_media_attribute_id',
         '_media_is_disabled' => '_media_is_disabled',
         '_media_position'    => '_media_position',
         '_media_lable'       => '_media_lable',
@@ -306,29 +307,42 @@ class Thespace_ImportExport_Helper_ProductParser extends Mage_Core_Helper_Abstra
                 
                 if ($options['advanced']) {
                     
+                    $hasImage = false;
+                    $maxCount = 0;
                     foreach ($dataItem as $key => $value) {
                         if (
                             in_array($key, [
-                                '_media_image', '_media_is_disabled', '_media_position', '_media_lable', 'image', 'small_image', 'thumbnail',
+                                '_media_image', '_media_attribute_id', '_media_is_disabled', '_media_position', '_media_lable', 'image', 'small_image', 'thumbnail',
                             ])
                             && !empty($value)
                             && preg_match("/|/is", $value)
                         ) {
                             $dataItem[$key] = explode('|', $value);
+                            $maxCount = max($maxCount, count($dataItem[$key]));
+                            $hasImage = true;
                         }
                     }
+                    if($hasImage){
+                        $attributeIds = [];
+                        for($i = 0; $i < $maxCount; $i++){
+                            $attributeIds[] = $options['media_attribute_id'];
+                        }
+                        $dataItem['_media_attribute_id'] = $attributeIds;
+                    }
+                    
                 } else {
                     
                     $imagePaths = explode("|", $dataItem['image']);
                     
                     $parsedSimpleData = [
-                        '_media_image'       => [],
-                        '_media_is_disabled' => [],
-                        '_media_position'    => [],
-                        '_media_lable'       => [],
-                        'image'              => '',
-                        'small_image'        => '',
-                        'thumbnail'          => '',
+                        '_media_image'        => [],
+                        '_media_attribute_id' => [],
+                        '_media_is_disabled'  => [],
+                        '_media_position'     => [],
+                        '_media_lable'        => [],
+                        'image'               => '',
+                        'small_image'         => '',
+                        'thumbnail'           => '',
                     ];
                     
                     $index = 0;
@@ -339,6 +353,7 @@ class Thespace_ImportExport_Helper_ProductParser extends Mage_Core_Helper_Abstra
                             $imageName = basename($mediaPath);
                             
                             $parsedSimpleData['_media_image'][] = $imageName;
+                            $parsedSimpleData['_media_attribute_id'][] = $options['media_attribute_id'];
                             $parsedSimpleData['_media_is_disabled'][] = 0;
                             $parsedSimpleData['_media_position'][] = $index;
                             $parsedSimpleData['_media_lable'][] = $imageName;
@@ -349,6 +364,8 @@ class Thespace_ImportExport_Helper_ProductParser extends Mage_Core_Helper_Abstra
                             $index++;
                         }
                     }
+                    
+                    $dataItem = array_merge($dataItem, $parsedSimpleData);
                 }
             }
             
