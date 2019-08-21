@@ -22,6 +22,12 @@
     <p>
         Numero di righe: <span id="import_form_product_import_rows_count">Seleziona file...</span>
     </p>
+    <p>
+        <label> Gestione avanzata immagini <input type="checkbox" value="1" name="image_advanced"></label>
+    </p>
+    <p>
+        <label> Sostituzione immagini <input type="checkbox" value="1" name="image_replace"></label>
+    </p>
 
     <button type="submit">Importa</button>
 </form>
@@ -40,7 +46,7 @@
 </table>
 
 <style>
-    #import_table_product_errors{
+    #import_table_product_errors {
         width: 100%;
         max-width: 400px;
         border: 1px solid grey;
@@ -106,7 +112,7 @@
                             rowsData += rowItem;
                         }
                         errorTable.find("tbody").html(rowsData);
-                    } else{
+                    } else {
 
                         $j.ajax({
                             url: '<?php echo Mage::helper("adminhtml")->getUrl("thespaceimportexport/import/ajaximportrun"); ?>',

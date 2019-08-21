@@ -322,7 +322,7 @@ class Thespace_ImportExport_Helper_ProductParser extends Mage_Core_Helper_Abstra
                                 '_media_image', '_media_attribute_id', '_media_is_disabled', '_media_position', '_media_lable', 'image', 'small_image', 'thumbnail',
                             ])
                             && !empty($value)
-                            && preg_match("/|/is", $value)
+//                            && preg_match("/|/is", $value)
                         ) {
                             $dataItem[$key] = explode('|', $value);
                             $maxCount = max($maxCount, count($dataItem[$key]));
@@ -330,6 +330,18 @@ class Thespace_ImportExport_Helper_ProductParser extends Mage_Core_Helper_Abstra
                         }
                     }
                     if ($hasImage) {
+                        
+                        if (isset($dataItem['_media_image'])) {
+                            $dataItem['_media_image'] = array_map(function ($imagePath) use ($imageHelper) {
+                                $mediaPath = $imageHelper->storeImage($imagePath);
+                                if ($mediaPath) {
+                                    return $mediaPath;
+                                } else {
+                                    return $imagePath;
+                                }
+                            }, $dataItem['_media_image']);
+                        }
+                        
                         $attributeIds = [];
                         for ($i = 0; $i < $maxCount; $i++) {
                             $attributeIds[] = $options['media_attribute_id'];
