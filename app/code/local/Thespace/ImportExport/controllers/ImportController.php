@@ -122,11 +122,12 @@ class Thespace_ImportExport_ImportController extends Mage_Adminhtml_Controller_A
         $productParserHelper = Mage::helper('thespaceimportexport/ProductParser');
         
         $filePath = $_POST['file'];
+        $imageReplace = !empty($_POST['image_replace']);
         
         $dataItems = $productParserHelper->getDataFromRows($csvHelper->getRows($filePath));
         $dataItems = $productParserHelper->applyParentCells($dataItems);
         $dataItems = $productParserHelper->applyImagesCells($dataItems, [
-            'advanced' => 0
+            'advanced' => 0,
         ]);
         
         $confItems = [];
@@ -168,6 +169,56 @@ class Thespace_ImportExport_ImportController extends Mage_Adminhtml_Controller_A
             $index++;
         }
         
+        
+        echo json_encode($response);
+        die();
+    }
+    
+    public function ajaximportclearimagesAction()
+    {
+        header('Content-Type: application/json');
+        $response = [
+            'status' => 'OK',
+            'errors' => [],
+        ];
+        
+        $csvHelper = Mage::helper('thespaceimportexport/Csv');
+        $productParserHelper = Mage::helper('thespaceimportexport/ProductParser');
+        
+        $filePath = $_POST['file'];
+        $imageReplace = !empty($_POST['image_replace']);
+        
+        $dataItems = $productParserHelper->getDataFromRows($csvHelper->getRows($filePath));
+        
+        if ($imageReplace) {
+            // Eliminazione immagini
+            
+            $replaceSkus = [];
+            foreach ($dataItems as $dataItem) {
+                if (isset($dataItem['sku'])) {
+                    $replaceSkus[] = $dataItem['sku'];
+                }
+            }
+            $replaceSkus = array_unique($replaceSkus);
+            $products = Mage::getModel('catalog/product')
+                ->getCollection()
+                ->addAttributeToFilter('sku', [
+                    'in' => $replaceSkus,
+                ])
+                ->addAttributeToSelect('id');
+            
+            foreach ($products as $product) {
+                $mediaGallery = Mage::getModel('catalog/product_attribute_media_api')->items($product->getId());
+                foreach ($mediaGallery as $mediaImage) {
+                    $mediaDir = Mage::getConfig()->getOptions()->getMediaDir();
+                    $mediaCatalogDir = $mediaDir . DS . 'catalog' . DS . 'product';
+                    $dirImagePath = str_replace("/", DS, $mediaImage['file']);
+                    $io = new Varien_Io_File();
+                    $io->rm($mediaCatalogDir . $dirImagePath);
+                    $remove = Mage::getModel('catalog/product_attribute_media_api')->remove($product->getId(), $mediaImage['file']);
+                }
+            }
+        }
         
         echo json_encode($response);
         die();
