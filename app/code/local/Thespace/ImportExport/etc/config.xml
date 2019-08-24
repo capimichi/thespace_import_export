@@ -42,9 +42,13 @@
                         <action>thespaceimportexport/import</action>
                     </menuitem1>
                     <menuitem2 module="ImportExport">
+                        <title>Upload immagini</title>
+                        <action>thespaceimportexport/images</action>
+                    </menuitem2>
+                    <menuitem3 module="ImportExport">
                         <title>Export</title>
                         <action>thespaceimportexport/export</action>
-                    </menuitem2>
+                    </menuitem3>
                 </children>
             </menu1>
         </menu>
