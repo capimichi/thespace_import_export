@@ -23,7 +23,8 @@ class Thespace_ImportExport_ConfigurableController extends Mage_Adminhtml_Contro
             'status' => 'OK',
             'errors' => [],
         ];
-        
+    
+        $importHelper = Mage::helper('thespaceimportexport/Import');
         $csvHelper = Mage::helper('thespaceimportexport/Csv');
         $productParserHelper = Mage::helper('thespaceimportexport/ProductParser');
         
@@ -37,8 +38,8 @@ class Thespace_ImportExport_ConfigurableController extends Mage_Adminhtml_Contro
         }
     
         $dataItems = $productParserHelper->applyParentCells($dataItems);
-        
-        $dataGroups = array_chunk($dataItems, 500);
+    
+        $dataGroups = $importHelper->groupImportItems($dataItems, 500);
         
         $import = Mage::getModel('fastsimpleimport/import');
         

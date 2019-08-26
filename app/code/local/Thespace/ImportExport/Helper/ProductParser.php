@@ -254,6 +254,25 @@ class Thespace_ImportExport_Helper_ProductParser extends Mage_Core_Helper_Abstra
             }
         }
         
+        foreach ($parentChildren as $parentSku => $children) {
+            
+            $parentHasRow = false;
+            
+            foreach ($dataItems as $dataItem) {
+                $sku = $dataItem['sku'];
+                
+                if ($sku == $parentSku) {
+                    $parentHasRow = true;
+                }
+            }
+            
+            if (!$parentHasRow) {
+                $dataItems[] = [
+                    'sku' => $parentSku,
+                ];
+            }
+        }
+        
         for ($i = 0; $i < count($dataItems); $i++) {
             $dataItem = $dataItems[$i];
             $sku = $dataItem['sku'];

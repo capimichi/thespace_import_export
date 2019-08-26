@@ -118,6 +118,7 @@ class Thespace_ImportExport_ImportController extends Mage_Adminhtml_Controller_A
             'errors' => [],
         ];
         
+        $importHelper = Mage::helper('thespaceimportexport/Import');
         $csvHelper = Mage::helper('thespaceimportexport/Csv');
         $productParserHelper = Mage::helper('thespaceimportexport/ProductParser');
         
@@ -129,26 +130,9 @@ class Thespace_ImportExport_ImportController extends Mage_Adminhtml_Controller_A
         $dataItems = $productParserHelper->applyImagesCells($dataItems, [
             'advanced' => 0,
         ]);
-        
-        $confItems = [];
-        $simpleItems = [];
-        $dataGroups = [];
-        
-        foreach ($dataItems as $dataItem) {
-            if (isset($dataItem['_type']) && $dataItem['_type'] == 'configurable') {
-                $confItems[] = $dataItem;
-            } else {
-                $simpleItems[] = $dataItem;
-            }
-        }
-        
-        foreach (array_chunk($simpleItems, 500) as $simpleItemGroup) {
-            $dataGroups[] = $simpleItemGroup;
-        }
-        
-        foreach (array_chunk($confItems, 500) as $confItemGroup) {
-            $dataGroups[] = $confItemGroup;
-        }
+    
+    
+        $dataGroups = $importHelper->groupImportItems($dataItems, 500);
         
         $import = Mage::getModel('fastsimpleimport/import');
         
