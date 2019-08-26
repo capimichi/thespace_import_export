@@ -3,4 +3,6 @@
 app/code/local/Thespace/ImportExport            app/code/local/Thespace/ImportExport
 # app/design
 app/design/adminhtml/default/default/template/thespace/import_export/export/export.phtml            app/design/adminhtml/default/default/template/thespace/import_export/export/export.phtml
+app/design/adminhtml/default/default/template/thespace/import_export/import/configurable.phtml            app/design/adminhtml/default/default/template/thespace/import_export/import/configurable.phtml
 app/design/adminhtml/default/default/template/thespace/import_export/import/import.phtml            app/design/adminhtml/default/default/template/thespace/import_export/import/import.phtml
+app/design/adminhtml/default/default/template/thespace/import_export/import/upload_images.phtml            app/design/adminhtml/default/default/template/thespace/import_export/import/upload_images.phtml

@@ -38,17 +38,21 @@
                 <sort_order>60</sort_order>
                 <children>
                     <menuitem1 module="ImportExport">
-                        <title>Import</title>
+                        <title>Import prodotti</title>
                         <action>thespaceimportexport/import</action>
                     </menuitem1>
                     <menuitem2 module="ImportExport">
-                        <title>Upload immagini</title>
-                        <action>thespaceimportexport/images</action>
+                        <title>Variazioni automatiche</title>
+                        <action>thespaceimportexport/configurable</action>
                     </menuitem2>
                     <menuitem3 module="ImportExport">
+                        <title>Upload immagini</title>
+                        <action>thespaceimportexport/images</action>
+                    </menuitem3>
+                    <menuitem4 module="ImportExport">
                         <title>Export</title>
                         <action>thespaceimportexport/export</action>
-                    </menuitem3>
+                    </menuitem4>
                 </children>
             </menu1>
         </menu>

@@ -1,21 +1,87 @@
 <script src="https://code.jquery.com/jquery-3.3.1.min.js"></script>
 <link rel="stylesheet" href="https://cdn.jsdelivr.net/gh/vadimsva/waitMe/waitMe.min.css"/>
 <script src="https://cdn.jsdelivr.net/gh/vadimsva/waitMe/waitMe.min.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/simple-ajax-uploader@2.5.5/SimpleAjaxUploader.min.js"></script>
 
 <h2>Upload immagini</h2>
-<form id="upload_images" method="post" enctype="multipart/form-data">
 
+<form>
+    <input name="form_key" type="hidden" value="<?php echo Mage::getSingleton('core/session')->getFormKey() ?>"/>
+    <button id="upload">Carica</button>
 </form>
+
+<p></p>
+<div class="table-container">
+    <table data-template-row="<tr id='{id}'><td>{name}</td><td class='row-status'>Caricata...</td></tr>">
+        <thead>
+        <tr>
+            <th>Immagine</th>
+            <th>Stato</th>
+        </tr>
+        </thead>
+        <tbody>
+
+        </tbody>
+    </table>
+</div>
+
 <p></p>
 <p></p>
 <br>
+
+<style>
+
+    .table-container {
+        max-height: 300px;
+        overflow: auto;
+    }
+
+    table {
+        width: 100%;
+        max-width: 400px;
+        border: 1px solid grey;
+    }
+</style>
 
 <script>
     $j = jQuery.noConflict();
 
     $j(function () {
 
-    
+        // var form = $j("form");
+        var index = 0;
+        var table = $j("table");
+
+        var uploader = new ss.SimpleUpload({
+            button: '#upload', // HTML element used as upload button
+            url: '<?php echo Mage::helper("adminhtml")->getUrl("thespaceimportexport/images/uploadimage"); ?>?isAjax=true&form_key=<?php echo Mage::getSingleton("core/session")->getFormKey() ?>',
+            responseType: 'json',
+            // form: form,
+            multiple: true,
+            allowedExtensions: ['jpg', 'jpeg', 'png', 'gif'],
+            name: 'file',
+            startXHR: function (filename, size) {
+                var row = table.data('template-row');
+                row = row.replace(/{name}/g, filename);
+                var id = 'row-' + btoa(filename);
+                row = row.replace(/{id}/g, id);
+                table.find('tbody').prepend(row);
+            },
+            endXHR: function (filename) {
+                // var id = 'row-' + btoa(filename);
+                // $j("#" + id).find('.row-status').html('');
+                // console.log(id);
+            },
+            // onComplete: function (filename, status, statusText, response, uploadBtn, fileSize) {
+            //     console.log('Ciao');
+            // },
+            // onSubmit: function (filename, extension) {
+            //     $j("table tbody").html('');
+            //     console.log('Submit');
+            // },
+
+        });
+
     });
 
 </script>

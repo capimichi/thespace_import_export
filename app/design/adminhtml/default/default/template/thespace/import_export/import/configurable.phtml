@@ -1,0 +1,141 @@
+<script src="https://code.jquery.com/jquery-3.3.1.min.js"></script>
+<link rel="stylesheet" href="https://cdn.jsdelivr.net/gh/vadimsva/waitMe/waitMe.min.css"/>
+<script src="https://cdn.jsdelivr.net/gh/vadimsva/waitMe/waitMe.min.js"></script>
+
+<h2>Variazioni automatiche</h2>
+<form id="import_form_product_upload" method="post" enctype="multipart/form-data">
+    <input name="form_key" type="hidden" value="<?php echo Mage::getSingleton('core/session')->getFormKey() ?>"/>
+
+    <label>
+        Import
+        <input type="file" name="file">
+    </label>
+
+    <input type="submit" value="Carica file">
+</form>
+<p></p>
+
+<form id="import_form_product_import" method="post" style="display: none;">
+    <input name="form_key" type="hidden" value="<?php echo Mage::getSingleton('core/session')->getFormKey() ?>"/>
+    <input id="import_form_product_import_file" name="file" type="hidden" value=""/>
+
+    <p>
+        Numero di righe: <span id="import_form_product_import_rows_count">Seleziona file...</span>
+    </p>
+    <p>
+        <label> Gestione avanzata immagini <input type="checkbox" value="1" name="image_advanced"></label>
+    </p>
+    <p>
+        <label> Sostituzione immagini <input type="checkbox" value="1" name="image_replace"></label>
+    </p>
+
+    <button type="submit">Importa</button>
+</form>
+<p></p>
+
+<table id="import_table_product_errors" style="display: none;"
+       data-template-row="<tr><td>{row}</td><td>{columns}</td></tr>">
+    <thead>
+    <tr>
+        <th>Riga</th>
+        <th>Colonne</th>
+    </tr>
+    </thead>
+    <tbody>
+    </tbody>
+</table>
+
+<style>
+    #import_table_product_errors {
+        width: 100%;
+        max-width: 400px;
+        border: 1px solid grey;
+    }
+</style>
+
+<script>
+
+    $j = jQuery.noConflict();
+
+    $j(function () {
+
+        $j("#import_form_product_upload").on("submit", function (e) {
+
+            var formData = new FormData(this);
+
+            $j.ajax({
+                url: '<?php echo Mage::helper("adminhtml")->getUrl("thespaceimportexport/import/ajaximportparse"); ?>',
+                method: 'post',
+                data: formData,
+                processData: false,
+                cache: false,
+                contentType: false,
+                success: function (response) {
+                    $j("#import_form_product_import").fadeIn(0);
+                    $j("#import_form_product_import_file").val(response.file);
+                    $j("#import_form_product_import_rows_count").html(response.rows_count);
+                },
+                error: function (response) {
+
+                }
+            });
+
+            e.preventDefault();
+        });
+
+        $j("#import_form_product_import").on("submit", function (e) {
+
+            var formData = new FormData(this);
+
+            $j.ajax({
+                url: '<?php echo Mage::helper("adminhtml")->getUrl("thespaceimportexport/import/ajaximportcheck"); ?>',
+                method: 'post',
+                data: formData,
+                processData: false,
+                cache: false,
+                contentType: false,
+                success: function (response) {
+
+                    var errorTable = $j("#import_table_product_errors");
+                    errorTable.find("tbody").html('');
+                    errorTable.fadeIn(0);
+
+                    if (response.errors.length) {
+                        var rowTemplate = errorTable.data('template-row');
+                        var rowsData = "";
+
+                        for (var i = 0; i < response.errors.length; i++) {
+                            var error = response.errors[i];
+                            var rowItem = rowTemplate;
+                            rowItem = rowItem.replace(/{row}/g, error.row);
+                            rowItem = rowItem.replace(/{columns}/g, error.columns);
+                            rowsData += rowItem;
+                        }
+                        errorTable.find("tbody").html(rowsData);
+                    } else {
+
+                        $j.ajax({
+                            url: '<?php echo Mage::helper("adminhtml")->getUrl("thespaceimportexport/import/ajaximportrun"); ?>',
+                            method: 'post',
+                            data: formData,
+                            processData: false,
+                            cache: false,
+                            contentType: false,
+                            success: function (response) {
+                                console.log(response);
+                            },
+                            error: function (response) {
+
+                            }
+                        });
+                    }
+                },
+                error: function (response) {
+
+                }
+            });
+
+            e.preventDefault();
+        });
+    });
+</script>
