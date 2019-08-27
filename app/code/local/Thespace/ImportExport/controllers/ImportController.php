@@ -10,7 +10,7 @@ class Thespace_ImportExport_ImportController extends Mage_Adminhtml_Controller_A
         
         // "Inject" into display
         // THe below example will not actualy show anything since the core/template is empty
-        $this->_addContent($this->getLayout()->createBlock('core/template')->setTemplate('thespace/import_export/import/import.phtml'));
+        $this->_addContent($this->getLayout()->createBlock('core/template')->setTemplate('thespace/import_export/import/import_products.phtml'));
         
         // "Output" display
         $this->renderLayout();
@@ -30,6 +30,7 @@ class Thespace_ImportExport_ImportController extends Mage_Adminhtml_Controller_A
             $importDirectory = implode(DIRECTORY_SEPARATOR, [
                     \Mage::getBaseDir('media'),
                     "thespace-import-export",
+                    "csv",
                 ]) . DIRECTORY_SEPARATOR;
             
             $canCreateImportDirectory = true;
@@ -110,6 +111,75 @@ class Thespace_ImportExport_ImportController extends Mage_Adminhtml_Controller_A
         die();
     }
     
+    public function ajaximportsplitAction()
+    {
+        header('Content-Type: application/json');
+        $response = [
+            'status' => 'OK',
+            'errors' => [],
+        ];
+        
+        $filePath = $_POST['file'];
+        
+        $importHelper = Mage::helper('thespaceimportexport/Import');
+        $csvHelper = Mage::helper('thespaceimportexport/Csv');
+        $productParserHelper = Mage::helper('thespaceimportexport/ProductParser');
+        
+        $now = new DateTime('now');
+        
+        $importDirectory = implode(DIRECTORY_SEPARATOR, [
+                \Mage::getBaseDir('media'),
+                "thespace-import-export",
+                "json",
+                $now->format('Y_m_d_h_i_s'),
+            ]) . DIRECTORY_SEPARATOR;
+        
+        $canCreateImportDirectory = true;
+        if (!file_exists($importDirectory)) {
+            $canCreateImportDirectory = mkdir($importDirectory, 0777, true);
+        }
+        
+        if ($canCreateImportDirectory) {
+            
+            if (is_writable($importDirectory)) {
+                
+                $dataItems = $productParserHelper->getDataFromRows($csvHelper->getRows($filePath));
+                $dataItems = $productParserHelper->applyParentCells($dataItems);
+                $dataItems = $productParserHelper->applyImagesCells($dataItems, [
+                    'advanced' => 0,
+                ]);
+                
+                $dataGroups = $importHelper->groupImportItems($dataItems, 500);
+                
+                $groupFiles = [];
+                
+                $groupIndex = 0;
+                foreach ($dataGroups as $dataGroup) {
+                    $importFile = $importDirectory . implode("-", [
+                            date("Y-m-d-H-i-s"),
+                            sprintf("%s.json", $groupIndex),
+                        ]);
+                    $groupIndex++;
+                    
+                    file_put_contents($importFile, json_encode($dataGroup, JSON_UNESCAPED_UNICODE));
+                    
+                    $groupFiles[] = $importFile;
+                }
+                
+                $response['files'] = $groupFiles;
+            } else {
+                $response['status'] = 'ERROR';
+                $response['errors'][] = sprintf("Cannot write import files in '%s'", $importDirectory);
+            }
+        } else {
+            $response['status'] = 'ERROR';
+            $response['errors'][] = sprintf("Cannot create import directory '%s'", $importDirectory);
+        }
+        
+        echo json_encode($response);
+        die();
+    }
+    
     public function ajaximportrunAction()
     {
         header('Content-Type: application/json');
@@ -130,8 +200,8 @@ class Thespace_ImportExport_ImportController extends Mage_Adminhtml_Controller_A
         $dataItems = $productParserHelper->applyImagesCells($dataItems, [
             'advanced' => 0,
         ]);
-    
-    
+        
+        
         $dataGroups = $importHelper->groupImportItems($dataItems, 500);
         
         $import = Mage::getModel('fastsimpleimport/import');
