@@ -33,28 +33,38 @@
 
     <adminhtml>
         <menu>
-            <menu1 translate="title" module="ImportExport">
+            <menu_ts_import_export translate="title" module="ImportExport">
                 <title>TS Imp/Exp</title>
                 <sort_order>60</sort_order>
                 <children>
-                    <menuitem1 module="ImportExport">
-                        <title>Import prodotti</title>
-                        <action>thespaceimportexport/import</action>
-                    </menuitem1>
-                    <menuitem2 module="ImportExport">
-                        <title>Variazioni automatiche</title>
-                        <action>thespaceimportexport/configurable</action>
-                    </menuitem2>
-                    <menuitem3 module="ImportExport">
-                        <title>Upload immagini</title>
-                        <action>thespaceimportexport/images</action>
-                    </menuitem3>
-                    <menuitem4 module="ImportExport">
+                    <menu_ts_import_export_import module="ImportExport">
+                        <title>Import</title>
+                        <children>
+                            <menu_ts_import_export_import_products module="ImportExport">
+                                <title>Import prodotti</title>
+                                <action>thespaceimportexport/import</action>
+                            </menu_ts_import_export_import_products>
+                            <menu_ts_import_export_import_variations module="ImportExport">
+                                <title>Variazioni automatiche</title>
+                                <action>thespaceimportexport/configurable</action>
+                            </menu_ts_import_export_import_variations>
+                            <menu_ts_import_export_import_images module="ImportExport">
+                                <title>Upload immagini</title>
+                                <action>thespaceimportexport/images</action>
+                            </menu_ts_import_export_import_images>
+                        </children>
+                    </menu_ts_import_export_import>
+                    <menu_ts_import_export_export module="ImportExport">
                         <title>Export</title>
-                        <action>thespaceimportexport/export</action>
-                    </menuitem4>
+                        <children>
+                            <menu_ts_import_export_export_categories module="ImportExport">
+                                <title>Export categories</title>
+                                <action>thespaceimportexport/exportcategories</action>
+                            </menu_ts_import_export_export_categories>
+                        </children>
+                    </menu_ts_import_export_export>
                 </children>
-            </menu1>
+            </menu_ts_import_export>
         </menu>
         <!--<acl>-->
         <!--<resources>-->

@@ -12,6 +12,8 @@ class Thespace_ImportExport_Helper_ProductParser extends Mage_Core_Helper_Abstra
         '_product_websites',
     ];
     
+    const ARRAY_SEPARATOR = '|';
+    
     const NOT_REQUIRED_HEADERS = [
         'created_at',
         'links_purchased_separately',
@@ -58,6 +60,12 @@ class Thespace_ImportExport_Helper_ProductParser extends Mage_Core_Helper_Abstra
         'name'                    => [
             'name',
             'nome',
+        ],
+        '_category'               => [
+            'category',
+            'categories',
+            'categoria',
+            'categorie',
         ],
         'sku'                     => [
             'sku',
@@ -157,10 +165,11 @@ class Thespace_ImportExport_Helper_ProductParser extends Mage_Core_Helper_Abstra
      *
      * @param $row
      * @param $attributes
+     * @param $categoryPathNames
      *
      * @return array
      */
-    public function getDataFromRow($row, $attributes = null)
+    public function getDataFromRow($row, $attributes = null, $categoryPathNames = null)
     {
         if (is_null($attributes)) {
             $attributes = Mage::getResourceModel('catalog/product_attribute_collection')
@@ -205,6 +214,23 @@ class Thespace_ImportExport_Helper_ProductParser extends Mage_Core_Helper_Abstra
             }
         }
         
+        foreach ($data as $key => $datum) {
+            $regexPattern = sprintf("/%s/is", preg_quote(self::ARRAY_SEPARATOR));
+            if (preg_match($regexPattern, $datum)) {
+                $datum = explode(self::ARRAY_SEPARATOR, $datum);
+                $data[$key] = $datum;
+            }
+        }
+        
+        if (!empty($data['_category'])) {
+            if (!is_array($data['_category'])) {
+                $data['_category'] = [$data['_category']];
+            }
+            foreach ($data['_category'] as $key => $category) {
+                $data['_category'][$key] = $categoryPathNames[$category];
+            }
+        }
+        
         return $data;
     }
     
@@ -217,13 +243,24 @@ class Thespace_ImportExport_Helper_ProductParser extends Mage_Core_Helper_Abstra
      */
     public function getDataFromRows($rows)
     {
+        $categoryParserHelper = Mage::helper('thespaceimportexport/CategoryParser');
         $attributes = Mage::getResourceModel('catalog/product_attribute_collection')
             ->getItems();
+        
+        $categories = Mage::getModel('catalog/category')->getCollection()
+            ->addAttributeToSelect('*');
+        
+        $categoryNames = $categoryParserHelper->categoryNames();
+        
+        $categoryPathNames = [];
+        foreach ($categories as $category) {
+            $categoryPathNames[$category->getId()] = $categoryParserHelper->getCategoryPathName($category, $categoryNames);
+        }
         
         $datas = [];
         
         foreach ($rows as $row) {
-            $data = $this->getDataFromRow($row, $attributes);
+            $data = $this->getDataFromRow($row, $attributes, $categoryPathNames);
             $datas[] = $data;
         }
         
@@ -258,7 +295,10 @@ class Thespace_ImportExport_Helper_ProductParser extends Mage_Core_Helper_Abstra
             $dataItem = $dataItems[$i];
             $sku = $dataItem['sku'];
             
-            $variationAttributeCodes = explode('|', $dataItem['variation_attributes']);
+            $variationAttributeCodes = $dataItem['variation_attributes'];
+            if (!is_array($variationAttributeCodes)) {
+                $variationAttributeCodes = [$variationAttributeCodes];
+            }
             
             if (isset($parentChildren[$sku])) {
                 $dataItem['_super_products_sku'] = [];
@@ -324,7 +364,7 @@ class Thespace_ImportExport_Helper_ProductParser extends Mage_Core_Helper_Abstra
                             && !empty($value)
 //                            && preg_match("/|/is", $value)
                         ) {
-                            $dataItem[$key] = explode('|', $value);
+                            $dataItem[$key] = $value;
                             $maxCount = max($maxCount, count($dataItem[$key]));
                             $hasImage = true;
                         }
@@ -351,7 +391,10 @@ class Thespace_ImportExport_Helper_ProductParser extends Mage_Core_Helper_Abstra
                     
                 } else {
                     
-                    $imagePaths = explode("|", $dataItem['image']);
+                    $imagePaths = $dataItem['image'];
+                    if (!is_array($imagePaths)) {
+                        $imagePaths = [$imagePaths];
+                    }
                     
                     $parsedSimpleData = [
                         '_media_image'        => [],
@@ -416,7 +459,10 @@ class Thespace_ImportExport_Helper_ProductParser extends Mage_Core_Helper_Abstra
         
         $row = self::getDataFromRow($row, $attributes);
         
-        $rowAttributeCodes = explode("|", $row['variation_attributes']);
+        $rowAttributeCodes = $row['variation_attributes'];
+        if (!is_array($rowAttributeCodes)) {
+            $rowAttributeCodes = [$rowAttributeCodes];
+        }
         
         $attributeValueGroups = [];
         
@@ -424,7 +470,10 @@ class Thespace_ImportExport_Helper_ProductParser extends Mage_Core_Helper_Abstra
             
             if (isset($row[$rowAttributeCode])) {
                 
-                $values = explode("|", $row[$rowAttributeCode]);
+                $values = $row[$rowAttributeCode];
+                if (!is_array($values)) {
+                    $values = [$values];
+                }
                 
                 $attributeValueGroups[] = array_unique($values);
             }

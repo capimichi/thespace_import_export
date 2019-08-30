@@ -2,48 +2,62 @@
 <link rel="stylesheet" href="https://cdn.jsdelivr.net/gh/vadimsva/waitMe/waitMe.min.css"/>
 <script src="https://cdn.jsdelivr.net/gh/vadimsva/waitMe/waitMe.min.js"></script>
 
-<h2>Caricamento prodotti</h2>
-<form id="import_form_product_upload" method="post" enctype="multipart/form-data">
-    <input name="form_key" type="hidden" value="<?php echo Mage::getSingleton('core/session')->getFormKey() ?>"/>
+<div id="import_products"
+     data-url-import-split="<?php echo Mage::helper("adminhtml")->getUrl("thespaceimportexport/import/ajaximportsplit"); ?>?isAjax=true&form_key=<?php echo Mage::getSingleton('core/session')->getFormKey() ?>"
+     data-url-import-parse="<?php echo Mage::helper("adminhtml")->getUrl("thespaceimportexport/import/ajaximportparse"); ?>?isAjax=true&form_key=<?php echo Mage::getSingleton('core/session')->getFormKey() ?>"
+     data-url-import-run="<?php echo Mage::helper("adminhtml")->getUrl("thespaceimportexport/import/ajaximportrun"); ?>?isAjax=true&form_key=<?php echo Mage::getSingleton('core/session')->getFormKey() ?>"
+     data-form-key="<?php echo Mage::getSingleton('core/session')->getFormKey() ?>"
+>
+    <h2>Caricamento prodotti</h2>
+    <form id="import_form_product_upload" method="post" enctype="multipart/form-data">
+        <input name="form_key" type="hidden" value="<?php echo Mage::getSingleton('core/session')->getFormKey() ?>"/>
 
-    <label>
-        Import
-        <input type="file" name="file">
-    </label>
+        <label>
+            Import
+            <input type="file" name="file">
+        </label>
 
-    <input type="submit" value="Carica file">
-</form>
-<p></p>
+        <input type="submit" value="Carica file">
+    </form>
+    <p></p>
 
-<form id="import_form_product_import" method="post" style="display: none;">
-    <input name="form_key" type="hidden" value="<?php echo Mage::getSingleton('core/session')->getFormKey() ?>"/>
-    <input id="import_form_product_import_file" name="file" type="hidden" value=""/>
+    <form id="import_form_product_import" method="post" style="display: none;">
+        <input name="form_key" type="hidden" value="<?php echo Mage::getSingleton('core/session')->getFormKey() ?>"/>
+        <input id="import_form_product_import_file" name="file" type="hidden" value=""/>
 
-    <p>
-        Numero di righe: <span id="import_form_product_import_rows_count">Seleziona file...</span>
-    </p>
-    <p>
-        <label> Gestione avanzata immagini <input type="checkbox" value="1" name="image_advanced"></label>
-    </p>
-    <p>
-        <label> Sostituzione immagini <input type="checkbox" value="1" name="image_replace"></label>
-    </p>
+        <p>
+            Numero di righe: <span id="import_form_product_import_rows_count">Seleziona file...</span>
+        </p>
+        <p>
+            <label> Righe per volta <input id="step_rows" type="text" value="50" name="step_rows"></label>
+        </p>
+        <p>
+            <label> Gestione avanzata immagini <input type="checkbox" value="1" name="image_advanced"></label>
+        </p>
+        <p>
+            <label> Sostituzione immagini <input type="checkbox" value="1" name="image_replace"></label>
+        </p>
+        <p id="progress_status">
 
-    <button type="submit">Importa</button>
-</form>
-<p></p>
+        </p>
 
-<table id="import_table_product_errors" style="display: none;"
-       data-template-row="<tr><td>{row}</td><td>{columns}</td></tr>">
-    <thead>
-    <tr>
-        <th>Riga</th>
-        <th>Colonne</th>
-    </tr>
-    </thead>
-    <tbody>
-    </tbody>
-</table>
+        <button type="submit">Importa</button>
+    </form>
+    <p></p>
+
+    <table id="import_table_product_errors" style="display: none;"
+           data-template-row="<tr><td>{row}</td><td>{columns}</td></tr>">
+        <thead>
+        <tr>
+            <th>Riga</th>
+            <th>Colonne</th>
+        </tr>
+        </thead>
+        <tbody>
+        </tbody>
+    </table>
+
+</div>
 
 <style>
     #import_table_product_errors {
@@ -59,12 +73,14 @@
 
     $j(function () {
 
+        var globals = $j("#import_products").data();
+
         $j("#import_form_product_upload").on("submit", function (e) {
 
             var formData = new FormData(this);
 
             $j.ajax({
-                url: '<?php echo Mage::helper("adminhtml")->getUrl("thespaceimportexport/import/ajaximportparse"); ?>',
+                url: globals.urlImportParse,
                 method: 'post',
                 data: formData,
                 processData: false,
@@ -85,12 +101,12 @@
 
         var importProductsForm = $j("#import_form_product_import");
 
-        importProductsForm.on("submit", function () {
+        importProductsForm.on("submit", function (e) {
 
             var formData = new FormData(this);
 
             $j.ajax({
-                url: '<?php echo Mage::helper("adminhtml")->getUrl("thespaceimportexport/import/ajaximportsplit"); ?>',
+                url: globals.urlImportSplit,
                 method: 'post',
                 data: formData,
                 processData: false,
@@ -98,12 +114,60 @@
                 contentType: false,
                 success: function (response) {
                     console.log(response);
+
+                    if (response.status === 'OK') {
+                        var groupFiles = response.files;
+
+                        importGroups(groupFiles, 0, {
+                            onProcess: function (response, index) {
+                                var progress = 'Import in corso: {step} / {total}';
+                                progress = progress.replace(/{step}/g, index + 1);
+                                progress = progress.replace(/{total}/g, groupFiles.length);
+                                $j("#progress_status").html(progress);
+                            },
+                            onComplete: function () {
+                                console.log('Complete');
+                            }
+                        });
+                    }
+
                 },
                 error: function (response) {
                     console.log(response);
                 }
-            })
+            });
+
+            e.preventDefault();
         });
+
+        function importGroups(groups, index, options) {
+
+            if (index < groups.length) {
+
+                var group = groups[index];
+
+                $j.ajax({
+                    url: globals.urlImportRun,
+                    method: 'post',
+                    data: {
+                        file: group,
+                        group: index,
+                    },
+                    // processData: false,
+                    // cache: false,
+                    // contentType: false,
+                    success: function (response) {
+                        console.log(response);
+                        options.onProcess(response, index);
+                        importGroups(groups, index + 1, options);
+                    }
+                });
+            } else {
+
+                options.onComplete();
+            }
+
+        }
 
         //$j("#import_form_product_import").on("submit", function (e) {
         //

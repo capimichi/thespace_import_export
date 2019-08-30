@@ -24,6 +24,8 @@ class Thespace_ImportExport_ImportController extends Mage_Adminhtml_Controller_A
             'errors' => [],
         ];
         
+        $now = new DateTime();
+        
         if (isset($_FILES['file'])) {
             $filePath = $_FILES['file']['tmp_name'];
             
@@ -31,6 +33,9 @@ class Thespace_ImportExport_ImportController extends Mage_Adminhtml_Controller_A
                     \Mage::getBaseDir('media'),
                     "thespace-import-export",
                     "csv",
+                    $now->format('Y'),
+                    $now->format('m'),
+                    $now->format('d'),
                 ]) . DIRECTORY_SEPARATOR;
             
             $canCreateImportDirectory = true;
@@ -120,6 +125,7 @@ class Thespace_ImportExport_ImportController extends Mage_Adminhtml_Controller_A
         ];
         
         $filePath = $_POST['file'];
+        $stepRows = $_POST['step_rows'];
         
         $importHelper = Mage::helper('thespaceimportexport/Import');
         $csvHelper = Mage::helper('thespaceimportexport/Csv');
@@ -131,7 +137,10 @@ class Thespace_ImportExport_ImportController extends Mage_Adminhtml_Controller_A
                 \Mage::getBaseDir('media'),
                 "thespace-import-export",
                 "json",
-                $now->format('Y_m_d_h_i_s'),
+                $now->format('Y'),
+                $now->format('m'),
+                $now->format('d'),
+                $now->format('Y-m-d-h-i-s'),
             ]) . DIRECTORY_SEPARATOR;
         
         $canCreateImportDirectory = true;
@@ -149,15 +158,14 @@ class Thespace_ImportExport_ImportController extends Mage_Adminhtml_Controller_A
                     'advanced' => 0,
                 ]);
                 
-                $dataGroups = $importHelper->groupImportItems($dataItems, 500);
+                $dataGroups = $importHelper->groupImportItems($dataItems, $stepRows);
                 
                 $groupFiles = [];
                 
-                $groupIndex = 0;
+                $groupIndex = 1;
                 foreach ($dataGroups as $dataGroup) {
                     $importFile = $importDirectory . implode("-", [
-                            date("Y-m-d-H-i-s"),
-                            sprintf("%s.json", $groupIndex),
+                            sprintf("%08d.json", $groupIndex),
                         ]);
                     $groupIndex++;
                     
@@ -183,6 +191,8 @@ class Thespace_ImportExport_ImportController extends Mage_Adminhtml_Controller_A
     public function ajaximportrunAction()
     {
         header('Content-Type: application/json');
+        header("Cache-Control: no-cache, must-revalidate"); //HTTP 1.1
+        
         $response = [
             'status' => 'OK',
             'errors' => [],
@@ -192,36 +202,49 @@ class Thespace_ImportExport_ImportController extends Mage_Adminhtml_Controller_A
         $csvHelper = Mage::helper('thespaceimportexport/Csv');
         $productParserHelper = Mage::helper('thespaceimportexport/ProductParser');
         
+        $groupIndex = $_POST['group'];
+        $response['group'] = $groupIndex;
         $filePath = $_POST['file'];
+        $dataGroup = json_decode(file_get_contents($filePath), true);
         $imageReplace = !empty($_POST['image_replace']);
-        
-        $dataItems = $productParserHelper->getDataFromRows($csvHelper->getRows($filePath));
-        $dataItems = $productParserHelper->applyParentCells($dataItems);
-        $dataItems = $productParserHelper->applyImagesCells($dataItems, [
-            'advanced' => 0,
-        ]);
-        
-        
-        $dataGroups = $importHelper->groupImportItems($dataItems, 500);
+
+//        $dataItems = $productParserHelper->getDataFromRows($csvHelper->getRows($filePath));
+//        $dataItems = $productParserHelper->applyParentCells($dataItems);
+//        $dataItems = $productParserHelper->applyImagesCells($dataItems, [
+//            'advanced' => 0,
+//        ]);
+//        $dataGroups = $importHelper->groupImportItems($dataItems, 500);
         
         $import = Mage::getModel('fastsimpleimport/import');
         
-        $index = 0;
-        foreach ($dataGroups as $dataGroup) {
+        try {
             
             $dataGroup = $productParserHelper->parseArrayCells($dataGroup);
             
-            try {
-                $import->processProductImport($dataGroup);
-            } catch (Exception $e) {
-                $error = [
-                    'group'  => $index,
-                    'errors' => $import->getErrorMessages(),
-                ];
-                $response['errors'][] = $error;
-            }
-            $index++;
+            $import->processProductImport($dataGroup);
+        } catch (Exception $e) {
+            $error = [
+                'errors' => $import->getErrorMessages(),
+            ];
+            $response['errors'][] = $error;
         }
+
+//        $index = 0;
+//        foreach ($dataGroups as $dataGroup) {
+//
+//            $dataGroup = $productParserHelper->parseArrayCells($dataGroup);
+//
+//            try {
+//                $import->processProductImport($dataGroup);
+//            } catch (Exception $e) {
+//                $error = [
+//                    'group'  => $index,
+//                    'errors' => $import->getErrorMessages(),
+//                ];
+//                $response['errors'][] = $error;
+//            }
+//            $index++;
+//        }
         
         
         echo json_encode($response);
