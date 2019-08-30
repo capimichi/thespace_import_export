@@ -57,6 +57,10 @@
                     <menu_ts_import_export_export module="ImportExport">
                         <title>Export</title>
                         <children>
+                            <menu_ts_import_export_export_products module="ImportExport">
+                                <title>Export prodotti</title>
+                                <action>thespaceimportexport/export</action>
+                            </menu_ts_import_export_export_products>
                             <menu_ts_import_export_export_categories module="ImportExport">
                                 <title>Export categories</title>
                                 <action>thespaceimportexport/exportcategories</action>

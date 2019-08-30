@@ -10,7 +10,7 @@ class Thespace_ImportExport_ExportController extends Mage_Adminhtml_Controller_A
         
         // "Inject" into display
         // THe below example will not actualy show anything since the core/template is empty
-        $this->_addContent($this->getLayout()->createBlock('core/template')->setTemplate('thespace/import_export/export/export.phtml'));
+        $this->_addContent($this->getLayout()->createBlock('core/template')->setTemplate('thespace/import_export/export/export_products.phtml'));
         
         // echo "Hello developer...";
         
@@ -20,121 +20,108 @@ class Thespace_ImportExport_ExportController extends Mage_Adminhtml_Controller_A
     
     public function exportAction()
     {
-        $manufacturer = isset($_POST['manufacturer']) ? $_POST['manufacturer'] : null;
+        header('Content-Type: application/json');
         
-        $storeViews = [];
-        $stores = Mage::app()->getStores();
+        $response = [
+            'status' => 'OK',
+            'errors' => [],
+        ];
         
-        foreach ($stores as $store) {
-            $storeViewCode = isset($_POST['store_view_' . $store->getCode()]) ? $_POST['store_view_' . $store->getCode()] : null;
-            if ($storeViewCode) {
-                $storeViews[] = $store;
-            }
-        }
-        $includeImages = isset($_POST['images']) ? true : false;
+        $file = isset($_POST['file']) ? $_POST['file'] : null;
         $page = isset($_POST['page']) ? $_POST['page'] : 1;
-        $pageSize = 500;
+        $stepRows = isset($_POST['step_rows']) ? $_POST['step_rows'] : 50;
         
-        $attributeCodes = [];
-        foreach ($_POST as $postKey => $postValue) {
-            if (substr($postKey, 0, 4) == "att_") {
-                $attributeCodes[] = preg_replace("/^att_/is", "", $postKey);
-            }
-        }
-        
-        $filePath = sys_get_temp_dir() . DIRECTORY_SEPARATOR . implode("-", [
-                'cm-export',
-                strtotime('now'),
-                '.csv',
-            ]);
-        $f = fopen($filePath, "w");
-        
-        $products = Mage::getModel('catalog/product')
+        $collection = Mage::getModel('catalog/product')
             ->getCollection()
             ->addAttributeToSelect('*')
-            ->addAttributeToFilter('visibility', 4)
-            ->setPageSize($pageSize)
+            ->setPageSize($stepRows)
             ->setCurPage($page);
+//            ->load();
         
-        if ($manufacturer) {
-            $products
-                ->addAttributeToFilter('manufacturer', ['eq' => $manufacturer]);
+        $response['pages'] = ceil($collection->getSize() / $stepRows);
+        
+        $f = fopen($file, 'a');
+        if ($page == 1) {
+            fputcsv($f, [
+                'sku',
+            ]);
         }
         
-        $exportedIds = [];
-        $attributeCodes = array_merge($attributeCodes, Mage::helper('thespaceimportexport/ProductRow')->getProductsUsedAttributeCodes($products));
-        
-        fputcsv($f, Mage::helper('thespaceimportexport/ProductRow')->getRowHeader($attributeCodes, $storeViews));
-        foreach ($products as $product) {
-            if (!in_array($product->getId(), $exportedIds)) {
-                $exportedIds[] = $product->getId();
-                
-                $row = Mage::helper('thespaceimportexport/ProductRow')->productToRow($product, $attributeCodes, $storeViews, $includeImages);
-                fputcsv($f, $row);
-                
-                if ($product->type_id == 'configurable') {
-                    $childrenIds = Mage::getModel('catalog/product_type_configurable')
-                        ->getChildrenIds($product->getId());
-                    $childrenIds = $childrenIds[0];
-                    foreach ($childrenIds as $childrenId) {
-                        if (!in_array($childrenId, $exportedIds)) {
-                            $childProduct = Mage::getModel('catalog/product')->load($childrenId);
-                            $exportedIds[] = $childProduct->getId();
-                            $row = Mage::helper('thespaceimportexport/ProductRow')->productToRow($childProduct, $attributeCodes, $storeViews, $includeImages);
-                            fputcsv($f, $row);
-                        }
-                    }
-                    
-                }
-            }
+        foreach ($collection as $product) {
+            fputcsv($f, [
+                $product->getSku(),
+            ]);
         }
+        
         fclose($f);
         
-        header('Content-Description: File Transfer');
-        header('Content-Type: application/octet-stream');
-        header('Content-Disposition: attachment; filename="' . basename($filePath) . '"');
-        header('Expires: 0');
-        header('Cache-Control: must-revalidate');
-        header('Pragma: public');
-        header('Content-Length: ' . filesize($filePath));
-        readfile($filePath);
+        echo json_encode($response);
         exit();
     }
     
-    public function pagesAction()
+    public function prepareAction()
     {
         header('Content-Type: application/json');
-        
-        $manufacturer = isset($_POST['manufacturer']) ? $_POST['manufacturer'] : null;
-        $pageSize = 500;
-        
-        $attributeCodes = [];
-        foreach ($_POST as $postKey => $postValue) {
-            if (substr($postKey, 0, 4) == "att_") {
-                $attributeCodes[] = preg_replace("/^att_/is", "", $postKey);
-            }
-        }
-        
-        $products = Mage::getModel('catalog/product')
-            ->getCollection()
-            ->addAttributeToSelect('*')
-            ->addAttributeToFilter('visibility', 4);
-        if ($manufacturer) {
-            $products
-                ->addAttributeToFilter('manufacturer', ['eq' => $manufacturer]);
-        }
-        
-        $count = $products->getSize();
-        $pages = ceil($count / $pageSize);
-        if (!$pages) {
-            $pages = 1;
-        }
-        
-        echo json_encode([
-            'result' => $pages,
+        $response = [
             'status' => 'OK',
-        ]);
+            'errors' => [],
+        ];
         
+        $now = new DateTime();
+        
+        $exportDirectory = implode(DIRECTORY_SEPARATOR, [
+                \Mage::getBaseDir('media'),
+                "thespace-import-export",
+                "csv",
+                $now->format('Y'),
+                $now->format('m'),
+                $now->format('d'),
+            ]) . DIRECTORY_SEPARATOR;
+        
+        $canCreateExportDirectory = true;
+        if (!file_exists($exportDirectory)) {
+            $canCreateExportDirectory = mkdir($exportDirectory, 0777, true);
+        }
+        
+        if ($canCreateExportDirectory) {
+            
+            $exportFile = $exportDirectory . implode("-", [
+                    $now->format("Y-m-d-H-i-s"),
+                    sprintf("export-product.csv"),
+                ]);
+            
+            if (is_writable($exportDirectory)) {
+                
+                touch($exportFile);
+                
+                $response['file'] = $exportFile;
+            } else {
+                $response['status'] = 'ERROR';
+                $response['errors'][] = sprintf("Cannot write export file '%s'", $exportFile);
+            }
+        } else {
+            $response['status'] = 'ERROR';
+            $response['errors'][] = sprintf("Cannot create export directory '%s'", $exportDirectory);
+        }
+        
+        echo json_encode($response);
+        die();
+    }
+    
+    public function downloadAction()
+    {
+        header('Content-Type: application/json');
+//        $manufacturer = isset($_POST['manufacturer']) ? $_POST['manufacturer'] : null;
+        $file = isset($_POST['file']) ? $_POST['file'] : null;
+        
+        header('Content-Description: File Transfer');
+        header('Content-Type: application/octet-stream');
+        header('Content-Disposition: attachment; filename="' . basename($file) . '"');
+        header('Expires: 0');
+        header('Cache-Control: must-revalidate');
+        header('Pragma: public');
+        header('Content-Length: ' . filesize($file));
+        readfile($file);
         exit();
     }
 }

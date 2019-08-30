@@ -1,0 +1,106 @@
+<script src="https://code.jquery.com/jquery-3.3.1.min.js"></script>
+<link rel="stylesheet" href="https://cdn.jsdelivr.net/gh/vadimsva/waitMe/waitMe.min.css"/>
+<script src="https://cdn.jsdelivr.net/gh/vadimsva/waitMe/waitMe.min.js"></script>
+
+
+<div id="export_products"
+     data-url-export-prepare="<?php echo Mage::helper("adminhtml")->getUrl("thespaceimportexport/export/prepare"); ?>?isAjax=true"
+     data-url-export-export="<?php echo Mage::helper("adminhtml")->getUrl("thespaceimportexport/export/export"); ?>?isAjax=true"
+     data-form-key="<?php echo Mage::getSingleton('core/session')->getFormKey() ?>"
+>
+    <h2>Export prodotti</h2>
+    <form id="export_form_product_upload" method="post" enctype="multipart/form-data">
+        <input name="file" type="hidden" value="<?php echo $filePath; ?>"/>
+
+        <p>
+            <label> Righe per volta <input id="step_rows" type="text" value="50" name="step_rows"></label>
+        </p>
+
+        <input type="submit" value="Export">
+    </form>
+    <p></p>
+</div>
+
+<script>
+
+    $j = jQuery.noConflict();
+
+    $j(function () {
+
+        var globals = $j("#export_products").data();
+
+        $j("#export_form_product_upload").on("submit", function (e) {
+
+            var stepRows = $j("#step_rows").val();
+
+            $j.ajax({
+                url: globals.urlExportPrepare,
+                method: 'post',
+                data: {
+                    form_key: globals.formKey
+                },
+                // processData: false,
+                cache: false,
+                // contentType: false,
+                success: function (response) {
+                    var file = response.file;
+
+                    exportRows(file, stepRows, 1, {
+                        onProcess: function (response, page) {
+                            console.log(page + '/' + response.pages);
+                        }
+                    });
+                },
+                error: function (response) {
+
+                }
+            });
+
+
+            e.preventDefault();
+        });
+
+        function exportRows(file, stepRows, page, options) {
+
+            if (typeof options === 'undefined') {
+                options = {};
+            }
+
+            $j.ajax({
+                url: globals.urlExportExport,
+                method: 'post',
+                data: {
+                    page: page,
+                    file: file,
+                    step_rows: stepRows,
+                    form_key: globals.formKey
+                },
+                cache: false,
+                success: function (response) {
+
+                    var pages = response.pages;
+
+
+                    if (typeof options.onProcess !== 'undefined') {
+                        options.onProcess(response, page);
+                    }
+
+                    if (page < pages) {
+
+                        exportRows(file, stepRows, page + 1, options);
+                    } else {
+                        if (typeof options.onComplete !== 'undefined') {
+                            options.onComplete(response);
+                        }
+                    }
+
+                },
+                error: function (response) {
+
+                }
+            });
+        }
+    });
+
+
+</script>
