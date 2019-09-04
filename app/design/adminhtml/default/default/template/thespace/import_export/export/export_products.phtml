@@ -11,6 +11,17 @@
     <h2>Export prodotti</h2>
     <form id="export_form_product_upload" method="post" enctype="multipart/form-data">
         <p>
+            <label> Store view
+                <?php $stores = Mage::app()->getStores(); ?>
+                <select id="store_view">
+                    <option>-</option>
+                    <?php foreach ($stores as $store) : ?>
+                        <option value="<?php echo $store->getId(); ?>"><?php echo $store->getName(); ?></option>
+                    <?php endforeach; ?>
+                </select>
+            </label>
+        </p>
+        <p>
             <label> Righe per volta <input id="step_rows" type="text" value="50" name="step_rows"></label>
         </p>
 
@@ -44,6 +55,7 @@
         $j("#export_form_product_upload").on("submit", function (e) {
 
             var stepRows = $j("#step_rows").val();
+            var storeView = $j("#store_view").val();
 
             $j.ajax({
                 url: globals.urlExportPrepare,
@@ -58,7 +70,7 @@
                     var file = response.file;
                     $j("#export_form_product_download_file").val(file);
 
-                    exportRows(file, stepRows, 1, {
+                    exportRows(file, stepRows, storeView, 1, {
                         onProcess: function (response, page) {
                             var progress = 'Export in corso: {step} / {total}';
                             progress = progress.replace(/{step}/g, page);
@@ -81,7 +93,7 @@
             e.preventDefault();
         });
 
-        function exportRows(file, stepRows, page, options) {
+        function exportRows(file, stepRows, storeView, page, options) {
 
             if (typeof options === 'undefined') {
                 options = {};
@@ -94,7 +106,8 @@
                     page: page,
                     file: file,
                     step_rows: stepRows,
-                    form_key: globals.formKey
+                    form_key: globals.formKey,
+                    store_view: storeView
                 },
                 cache: false,
                 success: function (response) {
@@ -108,7 +121,7 @@
 
                     if (page < pages) {
 
-                        exportRows(file, stepRows, page + 1, options);
+                        exportRows(file, stepRows, storeView, page + 1, options);
                     } else {
                         if (typeof options.onComplete !== 'undefined') {
                             options.onComplete(response);

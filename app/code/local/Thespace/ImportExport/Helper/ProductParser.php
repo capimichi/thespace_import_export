@@ -142,6 +142,7 @@ class Thespace_ImportExport_Helper_ProductParser extends Mage_Core_Helper_Abstra
         '_type',
         '_attribute_set',
         '_product_websites',
+        '_store',
     ];
     
     const STOCK_CSV_HEADERS = [
@@ -187,20 +188,51 @@ class Thespace_ImportExport_Helper_ProductParser extends Mage_Core_Helper_Abstra
     /**
      * @author Michele Capicchioni <capimichi@gmail.com>
      *
-     * @param $product
+     * @param      $product
+     * @param null $storeView
      *
      * @return array
      */
-    public function getRowFromProduct($product)
+    public function getRowFromProduct($product, $storeView = null)
     {
         $row = [];
         
-        $headers = array_merge(
-            self::DEFAULT_CSV_HEADERS
-        );
+        foreach (self::SPECIAL_CSV_HEADERS as $header) {
+            switch ($header) {
+                case "_category":
+                    $value = $product->getCategoryIds();
+                    if (is_array($value)) {
+                        $value = implode("|", $value);
+                    }
+                    break;
+                case "_type":
+                    $value = $product->getTypeId();
+                    break;
+                case "_attribute_set":
+                    $attributeSetModel = Mage::getModel("eav/entity_attribute_set");
+                    $attributeSetModel->load($product->getAttributeSetId());
+                    $value = $attributeSetModel->getAttributeSetName();
+                    break;
+                case "_product_websites":
+                    $value = "";
+                    break;
+                case "_store":
+                    $value = "";
+                    if ($storeView) {
+                        $value = $storeView->getCode();
+                    }
+                    break;
+            }
+            $row[$header] = $value;
+        }
         
-        foreach ($headers as $header) {
-            $row[$header] = $product->getData($header);
+        foreach (self::DEFAULT_CSV_HEADERS as $header) {
+            if ($storeView) {
+                $value = $product->setStoreId($storeView->getId())->getData($header);
+            } else {
+                $value = $product->getData($header);
+            }
+            $row[$header] = $value;
         }
         
         

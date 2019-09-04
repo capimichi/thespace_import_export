@@ -30,6 +30,10 @@ class Thespace_ImportExport_ExportController extends Mage_Adminhtml_Controller_A
         $productParserHelper = Mage::helper('thespaceimportexport/ProductParser');
         
         $file = isset($_POST['file']) ? $_POST['file'] : null;
+        $storeView = isset($_POST['store_view']) ? $_POST['store_view'] : null;
+        if ($storeView) {
+            $storeView = Mage::getModel('core/store')->load($storeView); //a store object
+        }
         $page = isset($_POST['page']) ? $_POST['page'] : 1;
         $stepRows = isset($_POST['step_rows']) ? $_POST['step_rows'] : 50;
         
@@ -49,7 +53,7 @@ class Thespace_ImportExport_ExportController extends Mage_Adminhtml_Controller_A
             $productIndex = 0;
             foreach ($collection as $product) {
                 if (!$productIndex) {
-                    $row = $productParserHelper->getRowFromProduct($product);
+                    $row = $productParserHelper->getRowFromProduct($product, $storeView);
                     fputcsv($f, array_keys($row));
                 }
                 $productIndex++;
