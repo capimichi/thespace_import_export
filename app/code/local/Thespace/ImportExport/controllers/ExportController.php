@@ -27,6 +27,8 @@ class Thespace_ImportExport_ExportController extends Mage_Adminhtml_Controller_A
             'errors' => [],
         ];
         
+        $productParserHelper = Mage::helper('thespaceimportexport/ProductParser');
+        
         $file = isset($_POST['file']) ? $_POST['file'] : null;
         $page = isset($_POST['page']) ? $_POST['page'] : 1;
         $stepRows = isset($_POST['step_rows']) ? $_POST['step_rows'] : 50;
@@ -41,16 +43,22 @@ class Thespace_ImportExport_ExportController extends Mage_Adminhtml_Controller_A
         $response['pages'] = ceil($collection->getSize() / $stepRows);
         
         $f = fopen($file, 'a');
+        
         if ($page == 1) {
-            fputcsv($f, [
-                'sku',
-            ]);
+            
+            $productIndex = 0;
+            foreach ($collection as $product) {
+                if (!$productIndex) {
+                    $row = $productParserHelper->getRowFromProduct($product);
+                    fputcsv($f, array_keys($row));
+                }
+                $productIndex++;
+            }
         }
         
         foreach ($collection as $product) {
-            fputcsv($f, [
-                $product->getSku(),
-            ]);
+            $row = $productParserHelper->getRowFromProduct($product);
+            fputcsv($f, $row);
         }
         
         fclose($f);

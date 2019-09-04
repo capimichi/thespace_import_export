@@ -136,6 +136,31 @@ class Thespace_ImportExport_Helper_ProductParser extends Mage_Core_Helper_Abstra
             'att_{attribute_code}',
         ],
     ];
+    
+    const SPECIAL_CSV_HEADERS = [
+        '_category',
+        '_type',
+        '_attribute_set',
+        '_product_websites',
+    ];
+    
+    const STOCK_CSV_HEADERS = [
+        'qty',
+        'is_in_stock',
+        'manage_stock',
+        'use_config_manage_stock',
+    ];
+    
+    const DEFAULT_CSV_HEADERS = [
+        'sku',
+        'name',
+        'description',
+        'short_description',
+        'price',
+        'status',
+        'tax_class_id',
+        'visibility',
+    ];
 
 //    const TYPE_KEY                    = "tipo";
 //    const TITLE_KEY                   = "titolo";
@@ -159,6 +184,28 @@ class Thespace_ImportExport_Helper_ProductParser extends Mage_Core_Helper_Abstra
 //    const TRANSLATE_TITLE_KEY         = "titolo_{langkey}";
 //    const TRANSLATE_DESCRIPTION_KEY   = "descrizione_{langkey}";
     
+    /**
+     * @author Michele Capicchioni <capimichi@gmail.com>
+     *
+     * @param $product
+     *
+     * @return array
+     */
+    public function getRowFromProduct($product)
+    {
+        $row = [];
+        
+        $headers = array_merge(
+            self::DEFAULT_CSV_HEADERS
+        );
+        
+        foreach ($headers as $header) {
+            $row[$header] = $product->getData($header);
+        }
+        
+        
+        return $row;
+    }
     
     /**
      * @author Michele Capicchioni <capimichi@gmail.com>
