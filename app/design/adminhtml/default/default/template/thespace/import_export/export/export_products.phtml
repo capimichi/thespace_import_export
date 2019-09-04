@@ -23,9 +23,10 @@
     <p></p>
 
     <form id="export_form_product_download"
-          action="<?php echo Mage::helper("adminhtml")->getUrl("thespaceimportexport/export/download"); ?>"
+          action="<?php echo Mage::helper("adminhtml")->getUrl("thespaceimportexport/export/down"); ?>"
           style="display: none;" method="post">
         <input id="export_form_product_download_file" name="file" type="hidden" value=""/>
+        <input type="hidden" name="form_key" value="<?php echo Mage::getSingleton('core/session')->getFormKey() ?>">
 
         <button type="submit">Download</button>
     </form>
@@ -59,7 +60,7 @@
 
                     exportRows(file, stepRows, 1, {
                         onProcess: function (response, page) {
-                            var progress = 'Import in corso: {step} / {total}';
+                            var progress = 'Export in corso: {step} / {total}';
                             progress = progress.replace(/{step}/g, page);
                             progress = progress.replace(/{total}/g, response.pages);
                             $j("#progress_status").html(progress);

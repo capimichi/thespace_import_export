@@ -116,20 +116,21 @@ class Thespace_ImportExport_ExportController extends Mage_Adminhtml_Controller_A
         die();
     }
     
-    public function downloadAction()
+    public function downAction()
     {
-        header('Content-Type: application/json');
 //        $manufacturer = isset($_POST['manufacturer']) ? $_POST['manufacturer'] : null;
         $file = isset($_POST['file']) ? $_POST['file'] : null;
         
-        header('Content-Description: File Transfer');
-        header('Content-Type: application/octet-stream');
-        header('Content-Disposition: attachment; filename="' . basename($file) . '"');
-        header('Expires: 0');
-        header('Cache-Control: must-revalidate');
-        header('Pragma: public');
-        header('Content-Length: ' . filesize($file));
-        readfile($file);
+        if ($file) {
+            header('Content-Description: File Transfer');
+            header('Content-Type: application/octet-stream');
+            header('Content-Disposition: attachment; filename="' . basename($file) . '"');
+            header('Expires: 0');
+            header('Cache-Control: must-revalidate');
+            header('Pragma: public');
+            header('Content-Length: ' . filesize($file));
+            readfile($file);
+        }
         exit();
     }
 }
