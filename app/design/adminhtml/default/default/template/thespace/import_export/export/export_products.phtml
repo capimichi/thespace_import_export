@@ -10,8 +10,6 @@
 >
     <h2>Export prodotti</h2>
     <form id="export_form_product_upload" method="post" enctype="multipart/form-data">
-        <input name="file" type="hidden" value="<?php echo $filePath; ?>"/>
-
         <p>
             <label> Righe per volta <input id="step_rows" type="text" value="50" name="step_rows"></label>
         </p>
@@ -21,6 +19,15 @@
         <p id="progress_status">
 
         </p>
+    </form>
+    <p></p>
+
+    <form id="export_form_product_download"
+          action="<?php echo Mage::helper("adminhtml")->getUrl("thespaceimportexport/export/download"); ?>"
+          style="display: none;" method="post">
+        <input id="export_form_product_download_file" name="file" type="hidden" value=""/>
+
+        <button type="submit">Download</button>
     </form>
     <p></p>
 </div>
@@ -48,6 +55,7 @@
                 // contentType: false,
                 success: function (response) {
                     var file = response.file;
+                    $j("#export_form_product_download_file").val(file);
 
                     exportRows(file, stepRows, 1, {
                         onProcess: function (response, page) {
@@ -55,6 +63,11 @@
                             progress = progress.replace(/{step}/g, page);
                             progress = progress.replace(/{total}/g, response.pages);
                             $j("#progress_status").html(progress);
+                        },
+                        onComplete: function (response) {
+                            $j("#progress_status").html('');
+                            $j("#export_form_product_download").fadeIn(0);
+                            console.log(response);
                         }
                     });
                 },
