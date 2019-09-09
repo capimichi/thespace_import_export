@@ -687,10 +687,11 @@ class Thespace_ImportExport_Helper_ProductParser extends Mage_Core_Helper_Abstra
      *
      * @param      $row
      * @param null $attributes
+     * @param null $existingSkus
      *
      * @return array
      */
-    public function getMissingHeadersInRow($row, $attributes = null)
+    public function getMissingHeadersInRow($row, $attributes = null, $existingSkus = null)
     {
         if (is_null($attributes)) {
             $attributes = Mage::getResourceModel('catalog/product_attribute_collection')
@@ -711,9 +712,15 @@ class Thespace_ImportExport_Helper_ProductParser extends Mage_Core_Helper_Abstra
             
             $sku = $data['sku'];
             
-            $product = \Mage::getModel('catalog/product')->loadByAttribute('sku', $sku);
+            if (is_array($existingSkus)) {
+                $productExists = in_array($sku, $existingSkus);
+            } else {
+                $productExists = \Mage::getModel('catalog/product')->loadByAttribute('sku', $sku) ? true : false;
+            }
+
+//            $product = \Mage::getModel('catalog/product')->loadByAttribute('sku', $sku);
             
-            if (!$product) {
+            if (!$productExists) {
                 
                 foreach (self::REQUIRED_NEW_PRODUCT_HEADERS as $requiredHeader) {
                     if (!isset($data[$requiredHeader])) {
@@ -742,11 +749,12 @@ class Thespace_ImportExport_Helper_ProductParser extends Mage_Core_Helper_Abstra
     /**
      * @author Michele Capicchioni <capimichi@gmail.com>
      *
-     * @param $rows
+     * @param      $rows
+     * @param null $existingSkus
      *
      * @return array
      */
-    public function getMissingHeadersInRows($rows)
+    public function getMissingHeadersInRows($rows, $existingSkus = null)
     {
         $missingHeadersRows = [];
         
@@ -754,7 +762,7 @@ class Thespace_ImportExport_Helper_ProductParser extends Mage_Core_Helper_Abstra
             ->getItems();
         
         foreach ($rows as $row) {
-            $missingHeaders = $this->getMissingHeadersInRow($row, $attributes);
+            $missingHeaders = $this->getMissingHeadersInRow($row, $attributes, $existingSkus);
             
             $missingHeadersRows[] = $missingHeaders;
         }

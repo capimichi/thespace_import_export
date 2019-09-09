@@ -81,6 +81,7 @@ class Thespace_ImportExport_ImportController extends Mage_Adminhtml_Controller_A
             'errors' => [],
         ];
         
+        $skuHelper = Mage::helper('thespaceimportexport/Sku');
         $csvHelper = Mage::helper('thespaceimportexport/Csv');
         $productParserHelper = Mage::helper('thespaceimportexport/ProductParser');
         
@@ -95,7 +96,9 @@ class Thespace_ImportExport_ImportController extends Mage_Adminhtml_Controller_A
             $rows[] = $row;
         }
         
-        $missingHeaderRows = $productParserHelper->getMissingHeadersInRows($rows);
+        $existingSkus = $skuHelper->getExistingSkus();
+        
+        $missingHeaderRows = $productParserHelper->getMissingHeadersInRows($rows, null, $existingSkus);
         
         foreach ($csvHelper->getRows($filePath) as $row) {
             
