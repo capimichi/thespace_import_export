@@ -93,7 +93,23 @@
                         file: response.file
                     }, {
                         onComplete: function (response) {
-                            console.log(response);
+
+                            if (response.status === 'OK') {
+
+                            } else {
+
+                                var table = $j("#import_table_product_errors");
+                                var content = "";
+
+                                $j.each(response.errors, function (index, error) {
+                                    var row = table.data('template-row');
+                                    row = row.replace(/{row}/g, error);
+                                    content += row;
+                                });
+
+                                table.find("tbody").html(content);
+                            }
+
                         }
                     });
                 }
