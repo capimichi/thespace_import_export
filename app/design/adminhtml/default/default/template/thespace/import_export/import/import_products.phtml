@@ -50,11 +50,10 @@
     <p></p>
 
     <table id="import_table_product_errors" style="display: none;"
-           data-template-row="<tr><td>{row}</td><td>{columns}</td></tr>">
+           data-template-row="<tr><td>{row}</td></tr>">
         <thead>
         <tr>
             <th>Riga</th>
-            <th>Colonne</th>
         </tr>
         </thead>
         <tbody>
@@ -89,10 +88,6 @@
                     $j("#import_form_product_import_file").val(response.file);
                     $j("#import_form_product_import_rows_count").html(response.rows_count);
                     $j("#import_form_product_upload_info").fadeIn(0);
-
-                    console.log('A');
-                    console.log(response);
-                    console.log('B');
 
                     checkImport({
                         file: response.file
