@@ -105,7 +105,7 @@ class Thespace_ImportExport_ImportController extends Mage_Adminhtml_Controller_A
             $missingHeaders = $missingHeaderRows[$index];
             
             if (count($missingHeaders)) {
-                $errorMessage = sprintf("Error in row %s: Missing headers: %s", $rowIndex, $missingHeaders);
+                $errorMessage = sprintf("Error in row '%s': Missing headers: '%s'", $rowIndex, implode(", ", $missingHeaders));
                 $response['errors'][] = $errorMessage;
             }
             
