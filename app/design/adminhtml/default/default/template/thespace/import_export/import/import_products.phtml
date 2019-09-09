@@ -5,6 +5,7 @@
 <div id="import_products"
      data-url-import-split="<?php echo Mage::helper("adminhtml")->getUrl("thespaceimportexport/import/ajaximportsplit"); ?>?isAjax=true&form_key=<?php echo Mage::getSingleton('core/session')->getFormKey() ?>"
      data-url-import-parse="<?php echo Mage::helper("adminhtml")->getUrl("thespaceimportexport/import/ajaximportparse"); ?>?isAjax=true&form_key=<?php echo Mage::getSingleton('core/session')->getFormKey() ?>"
+     data-url-import-check="<?php echo Mage::helper("adminhtml")->getUrl("thespaceimportexport/import/ajaximportcheck"); ?>?isAjax=true&form_key=<?php echo Mage::getSingleton('core/session')->getFormKey() ?>"
      data-url-import-run="<?php echo Mage::helper("adminhtml")->getUrl("thespaceimportexport/import/ajaximportrun"); ?>?isAjax=true&form_key=<?php echo Mage::getSingleton('core/session')->getFormKey() ?>"
      data-form-key="<?php echo Mage::getSingleton('core/session')->getFormKey() ?>"
 >
@@ -18,6 +19,12 @@
         </label>
 
         <input type="submit" value="Carica file">
+
+        <div class="import_form_product_upload_info" style="display:none;">
+            <p>
+                Numero di righe: <span id="import_form_product_import_rows_count">Seleziona file...</span>
+            </p>
+        </div>
     </form>
     <p></p>
 
@@ -25,9 +32,6 @@
         <input name="form_key" type="hidden" value="<?php echo Mage::getSingleton('core/session')->getFormKey() ?>"/>
         <input id="import_form_product_import_file" name="file" type="hidden" value=""/>
 
-        <p>
-            Numero di righe: <span id="import_form_product_import_rows_count">Seleziona file...</span>
-        </p>
         <p>
             <label> Righe per volta <input id="step_rows" type="text" value="50" name="step_rows"></label>
         </p>
@@ -79,22 +83,43 @@
 
             var formData = new FormData(this);
 
-            $j.ajax({
-                url: globals.urlImportParse,
-                method: 'post',
-                data: formData,
-                processData: false,
-                cache: false,
-                contentType: false,
-                success: function (response) {
+            parseImport(formData, {
+                onComplete: function (response) {
                     $j("#import_form_product_import").fadeIn(0);
                     $j("#import_form_product_import_file").val(response.file);
                     $j("#import_form_product_import_rows_count").html(response.rows_count);
-                },
-                error: function (response) {
+                    $j("#import_form_product_upload_info").fadeIn(0);
 
+                    console.log('A');
+                    console.log(response);
+                    console.log('B');
+
+                    checkImport({
+                        file: response.file
+                    }, {
+                        onComplete: function (response) {
+                            console.log(response);
+                        }
+                    });
                 }
             });
+
+            // $j.ajax({
+            //     url: globals.urlImportParse,
+            //     method: 'post',
+            //     data: formData,
+            //     processData: false,
+            //     cache: false,
+            //     contentType: false,
+            //     success: function (response) {
+            //         $j("#import_form_product_import").fadeIn(0);
+            //         $j("#import_form_product_import_file").val(response.file);
+            //         $j("#import_form_product_import_rows_count").html(response.rows_count);
+            //     },
+            //     error: function (response) {
+            //
+            //     }
+            // });
 
             e.preventDefault();
         });
@@ -105,16 +130,8 @@
 
             var formData = new FormData(this);
 
-            $j.ajax({
-                url: globals.urlImportSplit,
-                method: 'post',
-                data: formData,
-                processData: false,
-                cache: false,
-                contentType: false,
-                success: function (response) {
-                    console.log(response);
-
+            splitImport(formData, {
+                onComplete: function (response) {
                     if (response.status === 'OK') {
                         var groupFiles = response.files;
 
@@ -130,10 +147,6 @@
                             }
                         });
                     }
-
-                },
-                error: function (response) {
-                    console.log(response);
                 }
             });
 
@@ -167,6 +180,104 @@
                 options.onComplete();
             }
 
+        }
+
+        function parseImport(data, options) {
+
+            options = {
+                ...{
+                    onComplete: function (response) {
+
+                    },
+                    onError: function () {
+
+                    }
+                }, ...options
+            };
+
+
+            $j.ajax({
+                url: globals.urlImportParse,
+                method: 'post',
+                data: data,
+                processData: false,
+                cache: false,
+                contentType: false,
+                success: function (response) {
+                    options.onComplete(response);
+                },
+                error: function () {
+                    options.onError();
+                }
+
+            });
+        }
+
+        /**
+         * Split files
+         * @param data
+         * @param options
+         */
+        function splitImport(data, options) {
+
+            options = {
+                ...{
+                    onComplete: function (response) {
+
+                    },
+                    onError: function () {
+
+                    }
+                }, ...options
+            };
+
+            $j.ajax({
+                url: globals.urlImportSplit,
+                method: 'post',
+                data: data,
+                processData: false,
+                cache: false,
+                contentType: false,
+                success: function (response) {
+                    options.onComplete(response);
+                },
+                error: function () {
+                    options.onError();
+                }
+            });
+        }
+
+        /**
+         * Split files
+         * @param data
+         * @param options
+         */
+        function checkImport(data, options) {
+
+            options = {
+                ...{
+                    onComplete: function (response) {
+
+                    },
+                    onError: function () {
+
+                    }
+                }, ...options
+            };
+
+            console.log(data);
+
+            $j.ajax({
+                url: globals.urlImportCheck,
+                method: 'post',
+                data: data,
+                success: function (response) {
+                    options.onComplete(response);
+                },
+                error: function () {
+                    options.onError();
+                }
+            });
         }
 
         //$j("#import_form_product_import").on("submit", function (e) {

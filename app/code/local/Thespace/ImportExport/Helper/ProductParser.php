@@ -227,11 +227,11 @@ class Thespace_ImportExport_Helper_ProductParser extends Mage_Core_Helper_Abstra
         }
         
         foreach (self::DEFAULT_CSV_HEADERS as $header) {
-            if ($storeView) {
-                $value = $product->setStoreId($storeView->getId())->getData($header);
-            } else {
+//            if ($storeView) {
+//                $value = $product->setStoreId($storeView->getId())->getData($header);
+//            } else {
                 $value = $product->getData($header);
-            }
+//            }
             $row[$header] = $value;
         }
         

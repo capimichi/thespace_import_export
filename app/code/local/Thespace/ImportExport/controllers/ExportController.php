@@ -38,7 +38,15 @@ class Thespace_ImportExport_ExportController extends Mage_Adminhtml_Controller_A
         $stepRows = isset($_POST['step_rows']) ? $_POST['step_rows'] : 50;
         
         $collection = Mage::getModel('catalog/product')
-            ->getCollection()
+            ->getCollection();
+        
+        if ($storeView) {
+            $collection
+                ->addStoreFilter($storeView->getId())
+                ->setStoreId($storeView->getId());
+        }
+        
+        $collection
             ->addAttributeToSelect('*')
             ->setPageSize($stepRows)
             ->setCurPage($page);
@@ -61,7 +69,7 @@ class Thespace_ImportExport_ExportController extends Mage_Adminhtml_Controller_A
         }
         
         foreach ($collection as $product) {
-            $row = $productParserHelper->getRowFromProduct($product);
+            $row = $productParserHelper->getRowFromProduct($product, $storeView);
             fputcsv($f, $row);
         }
         
