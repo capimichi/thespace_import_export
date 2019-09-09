@@ -735,7 +735,7 @@ class Thespace_ImportExport_Helper_ProductParser extends Mage_Core_Helper_Abstra
                     
                     if ($isRequired && !in_array($attributeCode, self::NOT_REQUIRED_HEADERS)) {
                         if (!isset($data[$attributeCode])) {
-                            $missingHeaders[] = $attributeCode;
+                            $missingHeaders[] = sprintf("att_%s", $attributeCode);
                         }
                     }
                 }

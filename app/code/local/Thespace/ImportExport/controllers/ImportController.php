@@ -98,7 +98,7 @@ class Thespace_ImportExport_ImportController extends Mage_Adminhtml_Controller_A
         
         $existingSkus = $skuHelper->getExistingSkus();
         
-        $missingHeaderRows = $productParserHelper->getMissingHeadersInRows($rows, null, $existingSkus);
+        $missingHeaderRows = $productParserHelper->getMissingHeadersInRows($rows, $existingSkus);
         
         foreach ($csvHelper->getRows($filePath) as $row) {
             
