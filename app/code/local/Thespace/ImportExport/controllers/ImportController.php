@@ -89,7 +89,13 @@ class Thespace_ImportExport_ImportController extends Mage_Adminhtml_Controller_A
         $index = 0;
         $rowIndex = 1;
         
-        $missingHeaderRows = $productParserHelper->getMissingHeadersInRows($csvHelper->getRows($filePath));
+        $rows = [];
+        
+        foreach ($csvHelper->getRows($filePath) as $row) {
+            $rows[] = $row;
+        }
+        
+        $missingHeaderRows = $productParserHelper->getMissingHeadersInRows($rows);
         
         foreach ($csvHelper->getRows($filePath) as $row) {
             

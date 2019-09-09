@@ -230,7 +230,7 @@ class Thespace_ImportExport_Helper_ProductParser extends Mage_Core_Helper_Abstra
 //            if ($storeView) {
 //                $value = $product->setStoreId($storeView->getId())->getData($header);
 //            } else {
-                $value = $product->getData($header);
+            $value = $product->getData($header);
 //            }
             $row[$header] = $value;
         }
@@ -681,87 +681,87 @@ class Thespace_ImportExport_Helper_ProductParser extends Mage_Core_Helper_Abstra
         
         return $parsedDataItems;
     }
+    
+    /**
+     * @author Michele Capicchioni <capimichi@gmail.com>
+     *
+     * @param      $row
+     * @param null $attributes
+     *
+     * @return array
+     */
+    public function getMissingHeadersInRow($row, $attributes = null)
+    {
+        if (is_null($attributes)) {
+            $attributes = Mage::getResourceModel('catalog/product_attribute_collection')
+                ->getItems();
+        }
+        
+        $data = $this->getDataFromRow($row);
+        
+        $missingHeaders = [];
+        
+        foreach (self::REQUIRED_HEADERS as $requiredHeader) {
+            if (!isset($data[$requiredHeader])) {
+                $missingHeaders[] = $requiredHeader;
+            }
+        }
+        
+        if (isset($data['sku'])) {
+            
+            $sku = $data['sku'];
+            
+            $product = \Mage::getModel('catalog/product')->loadByAttribute('sku', $sku);
+            
+            if (!$product) {
+                
+                foreach (self::REQUIRED_NEW_PRODUCT_HEADERS as $requiredHeader) {
+                    if (!isset($data[$requiredHeader])) {
+                        $missingHeaders[] = $requiredHeader;
+                    }
+                }
+                
+                foreach ($attributes as $attribute) {
+                    $isRequired = intval($attribute->getData('is_required'));
+                    $attributeCode = $attribute->getData('attribute_code');
+//                    $isUserDefined = intval($attribute->getData('is_user_defined'));
+                    
+                    if ($isRequired && !in_array($attributeCode, self::NOT_REQUIRED_HEADERS)) {
+                        if (!isset($data[$attributeCode])) {
+                            $missingHeaders[] = $attributeCode;
+                        }
+                    }
+                }
+                
+            }
+        }
+        
+        return $missingHeaders;
+    }
+    
+    /**
+     * @author Michele Capicchioni <capimichi@gmail.com>
+     *
+     * @param $rows
+     *
+     * @return array
+     */
+    public function getMissingHeadersInRows($rows)
+    {
+        $missingHeadersRows = [];
+        
+        $attributes = Mage::getResourceModel('catalog/product_attribute_collection')
+            ->getItems();
+        
+        foreach ($rows as $row) {
+            $missingHeaders = $this->getMissingHeadersInRow($row, $attributes);
+            
+            $missingHeadersRows[] = $missingHeaders;
+        }
+        
+        return $missingHeadersRows;
+    }
 
-//    /**
-//     * @author Michele Capicchioni <capimichi@gmail.com>
-//     *
-//     * @param      $row
-//     * @param null $attributes
-//     *
-//     * @return array
-//     */
-//    public function getMissingHeadersInRow($row, $attributes = null)
-//    {
-//        if (is_null($attributes)) {
-//            $attributes = Mage::getResourceModel('catalog/product_attribute_collection')
-//                ->getItems();
-//        }
-//
-//        $data = $this->getDataFromRow($row);
-//
-//        $missingHeaders = [];
-//
-//        foreach (self::REQUIRED_HEADERS as $requiredHeader) {
-//            if (!isset($data[$requiredHeader])) {
-//                $missingHeaders[] = $requiredHeader;
-//            }
-//        }
-//
-//        if (isset($data['sku'])) {
-//
-//            $sku = $data['sku'];
-//
-//            $product = \Mage::getModel('catalog/product')->loadByAttribute('sku', $sku);
-//
-//            if (!$product) {
-//
-//                foreach (self::REQUIRED_NEW_PRODUCT_HEADERS as $requiredHeader) {
-//                    if (!isset($data[$requiredHeader])) {
-//                        $missingHeaders[] = $requiredHeader;
-//                    }
-//                }
-//
-//                foreach ($attributes as $attribute) {
-//                    $isRequired = intval($attribute->getData('is_required'));
-//                    $attributeCode = $attribute->getData('attribute_code');
-////                    $isUserDefined = intval($attribute->getData('is_user_defined'));
-//
-//                    if ($isRequired && !in_array($attributeCode, self::NOT_REQUIRED_HEADERS)) {
-//                        if (!isset($data[$attributeCode])) {
-//                            $missingHeaders[] = $attributeCode;
-//                        }
-//                    }
-//                }
-//
-//            }
-//        }
-//
-//        return $missingHeaders;
-//    }
-//
-//    /**
-//     * @author Michele Capicchioni <capimichi@gmail.com>
-//     *
-//     * @param $rows
-//     *
-//     * @return array
-//     */
-//    public function getMissingHeadersInRows($rows)
-//    {
-//        $missingHeadersRows = [];
-//
-//        $attributes = Mage::getResourceModel('catalog/product_attribute_collection')
-//            ->getItems();
-//
-//        foreach ($rows as $row) {
-//            $missingHeaders = $this->getMissingHeadersInRow($row, $attributes);
-//
-//            $missingHeadersRows[] = $missingHeaders;
-//        }
-//
-//        return $missingHeadersRows;
-//    }
-//
 //    /**
 //     * @param $row
 //     *
