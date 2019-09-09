@@ -53,7 +53,7 @@
            data-template-row="<tr><td>{row}</td></tr>">
         <thead>
         <tr>
-            <th>Riga</th>
+            <th>Errori</th>
         </tr>
         </thead>
         <tbody>
@@ -84,7 +84,6 @@
 
             parseImport(formData, {
                 onComplete: function (response) {
-                    $j("#import_form_product_import").fadeIn(0);
                     $j("#import_form_product_import_file").val(response.file);
                     $j("#import_form_product_import_rows_count").html(response.rows_count);
                     $j("#import_form_product_upload_info").fadeIn(0);
@@ -95,7 +94,7 @@
                         onComplete: function (response) {
 
                             if (response.status === 'OK') {
-
+                                $j("#import_form_product_import").fadeIn(0);
                             } else {
 
                                 var table = $j("#import_table_product_errors");
@@ -108,6 +107,7 @@
                                 });
 
                                 table.find("tbody").html(content);
+                                table.fadeIn(0);
                             }
 
                         }
