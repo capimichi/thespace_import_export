@@ -21,6 +21,8 @@ class Thespace_ImportExport_Helper_Image extends Mage_Core_Helper_Abstract
         $imageContent = null;
         $baseName = null;
         
+        $mediaImportDir = Mage::getBaseDir('media') . DIRECTORY_SEPARATOR . 'import' . DIRECTORY_SEPARATOR;
+        
         if (self::isImageUrl($path)) {
             $ch = curl_init();
             curl_setopt($ch, CURLOPT_URL, $path);
@@ -31,9 +33,15 @@ class Thespace_ImportExport_Helper_Image extends Mage_Core_Helper_Abstract
             curl_close($ch);
             $baseName = basename(parse_url($path, PHP_URL_PATH));
         } else {
+            
             if (file_exists($path)) {
                 $baseName = basename($path);
                 $imageContent = file_get_contents($path);
+            }
+            
+            if (file_exists($mediaImportDir . $path)) {
+                $mediaImportPath = $mediaImportDir . $path;
+                $imageContent = null;
             }
         }
         
@@ -71,7 +79,6 @@ class Thespace_ImportExport_Helper_Image extends Mage_Core_Helper_Abstract
                 sprintf(".%s", $ext),
             ]);
             
-            $mediaImportDir = Mage::getBaseDir('media') . DIRECTORY_SEPARATOR . 'import' . DIRECTORY_SEPARATOR;
             if (!file_exists($mediaImportDir)) {
                 mkdir($mediaImportDir, 0777, true);
             }

@@ -159,9 +159,9 @@ class Thespace_ImportExport_ImportController extends Mage_Adminhtml_Controller_A
                 
                 $dataItems = $productParserHelper->getDataFromRows($csvHelper->getRows($filePath));
                 $dataItems = $productParserHelper->applyParentCells($dataItems);
-                $dataItems = $productParserHelper->applyImagesCells($dataItems, [
-                    'advanced' => 0,
-                ]);
+//                $dataItems = $productParserHelper->applyImagesCells($dataItems, [
+//                    'advanced' => 0,
+//                ]);
                 
                 $dataGroups = $importHelper->groupImportItems($dataItems, $stepRows);
                 
@@ -205,6 +205,7 @@ class Thespace_ImportExport_ImportController extends Mage_Adminhtml_Controller_A
         
         $importHelper = Mage::helper('thespaceimportexport/Import');
         $csvHelper = Mage::helper('thespaceimportexport/Csv');
+        $skuHelper = Mage::helper('thespaceimportexport/Sku');
         $productParserHelper = Mage::helper('thespaceimportexport/ProductParser');
         
         $groupIndex = $_POST['group'];
@@ -223,6 +224,12 @@ class Thespace_ImportExport_ImportController extends Mage_Adminhtml_Controller_A
         $import = Mage::getModel('fastsimpleimport/import');
         
         try {
+            $dataGroup = $productParserHelper->parseImages($dataGroup);
+            
+            if ($imageReplace) {
+                $existingSkus = $skuHelper->getExistingSkus();
+                $productParserHelper->clearImages($dataGroup, $existingSkus);
+            }
             
             $dataGroup = $productParserHelper->parseArrayCells($dataGroup);
             

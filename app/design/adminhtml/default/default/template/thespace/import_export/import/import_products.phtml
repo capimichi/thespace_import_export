@@ -96,6 +96,8 @@
 
         var globals = $j("#import_products").data();
 
+        var errorsTable = $j("#import_table_product_errors");
+
         $j("#import_form_product_upload").on("submit", function (e) {
 
             var formData = new FormData(this);
@@ -115,7 +117,7 @@
                                 $j("#import_form_product_import").fadeIn(0);
                             } else {
 
-                                var table = $j("#import_table_product_errors");
+                                
                                 var content = "";
 
                                 $j.each(response.errors, function (index, error) {

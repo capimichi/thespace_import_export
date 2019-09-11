@@ -519,6 +519,87 @@ class Thespace_ImportExport_Helper_ProductParser extends Mage_Core_Helper_Abstra
     /**
      * @author Michele Capicchioni <capimichi@gmail.com>
      *
+     * @param       $dataItems
+     * @param array $options
+     *
+     * @return mixed
+     */
+    public function parseImages($dataItems, $options = [])
+    {
+        $options = array_merge([
+            'media_attribute_id' => Mage::getSingleton('catalog/product')->getResource()->getAttribute('media_gallery')->getAttributeId(),
+            'advanced'           => 0,
+        ], $options);
+        
+        $imageHelper = Mage::helper('thespaceimportexport/Image');
+        
+        if (!$options['advanced']) {
+            foreach ($dataItems as $key => $dataItem) {
+                
+                $images = $dataItem['image'];
+                if (!is_array($images)) {
+                    $images = [$images];
+                }
+                
+                $_mediaImages = [];
+                $_mediaLabels = [];
+                $_mediaIsDisableds = [];
+                $_mediaAttributeIds = [];
+                $_mediaPositions = [];
+                $index = 0;
+                foreach ($images as $image) {
+                    $image = $imageHelper->storeImage($image);
+                    $_mediaImages[] = basename($image);;
+                    $_mediaLabels[] = basename($image);;
+                    $_mediaIsDisableds[] = 0;
+                    $_mediaAttributeIds[] = $options['media_attribute_id'];
+                    $_mediaPositions[] = $index;
+                    $dataItems[$key]['image'] = basename($image);
+                    $dataItems[$key]['small_image'] = basename($image);;
+                    $dataItems[$key]['thumbnail'] = basename($image);;
+                    $index++;
+                }
+                
+                $dataItems[$key]['_media_image'] = $_mediaImages;
+                $dataItems[$key]['_media_attribute_id'] = $_mediaAttributeIds;
+                $dataItems[$key]['_media_is_disabled'] = $_mediaIsDisableds;
+                $dataItems[$key]['_media_position'] = $_mediaPositions;
+                $dataItems[$key]['_media_lable'] = $_mediaLabels;
+            }
+        }
+        
+        return $dataItems;
+    }
+    
+    /**
+     * @author Michele Capicchioni <capimichi@gmail.com>
+     *
+     * @param $dataItems
+     * @param $existingSkus
+     */
+    public function clearImages($dataItems, $existingSkus)
+    {
+        foreach ($dataItems as $dataItem) {
+            
+            $sku = $dataItem['sku'];
+            if (
+                in_array($sku, $existingSkus)
+                && !empty($dataItem['_media_image'])
+            ) {
+                $product = Mage::getModel('catalog/product')->loadByAttribute('sku', $sku);
+                $mediaApi = Mage::getModel("catalog/product_attribute_media_api");
+                $items = $mediaApi->items($product->getId());
+                foreach ($items as $item) {
+                    $mediaApi->remove($product->getId(), $item['file']);
+                }
+                
+            }
+        }
+    }
+    
+    /**
+     * @author Michele Capicchioni <capimichi@gmail.com>
+     *
      * @param $row
      * @param $attributes
      *
