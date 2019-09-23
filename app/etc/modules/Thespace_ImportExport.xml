@@ -1,0 +1,9 @@
+<?xml version="1.0"?>
+<config>
+    <modules>
+        <Thespace_ImportExport>
+            <active>true</active>
+            <codePool>local</codePool>
+        </Thespace_ImportExport>
+    </modules>
+</config>
