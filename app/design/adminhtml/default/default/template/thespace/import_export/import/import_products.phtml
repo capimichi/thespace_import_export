@@ -96,8 +96,6 @@
 
         var globals = $j("#import_products").data();
 
-        var errorsTable = $j("#import_table_product_errors");
-
         $j("#import_form_product_upload").on("submit", function (e) {
 
             var formData = new FormData(this);
@@ -126,13 +124,8 @@
                                 var content = "";
 
                                 $j.each(response.errors, function (index, error) {
-                                    var row = errorsTable.data('template-row');
-                                    row = row.replace(/{row}/g, error);
-                                    content += row;
+                                    printError(error);
                                 });
-
-                                errorsTable.find("tbody").html(content);
-                                errorsTable.fadeIn(0);
                             }
                         },
                         onError: function (response) {
@@ -323,6 +316,15 @@
                     options.onError(response);
                 }
             });
+        }
+
+        function printError(errorText) {
+            var errorsTable = $j("#import_table_product_errors");
+            errorsTable.fadeIn(0);
+
+            var row = errorsTable.data('template-row');
+            row = row.replace(/{row}/g, errorText);
+            errorsTable.find("tbody").prepend(row);
         }
 
         //$j("#import_form_product_import").on("submit", function (e) {
