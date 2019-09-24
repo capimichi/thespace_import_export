@@ -155,7 +155,7 @@
                             onProcess: function (response, index) {
 
                                 $j.each(response.errors, function (index, error) {
-                                    printError(JSON.stringify(error));
+                                    printError((index + 1) + " - " + JSON.stringify(error));
                                 });
 
                                 var progress = 'Import in corso: {step} / {total}';
