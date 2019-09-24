@@ -32,12 +32,14 @@
 
 
         var form = $j("#configuration_form");
-        form.on("submit", function () {
+        form.on("submit", function (e) {
             var data = $j(this).serialize();
             saveData(data)
                 .done(function (response) {
                     alert('Salvato');
                 });
+
+            e.preventDefault();
         });
 
         function saveData(data) {
