@@ -106,33 +106,35 @@
             parseImport(formData, {
                 onComplete: function (response) {
 
-                    loading('Verifica del file');
-                    $j("#import_form_product_import_file").val(response.file);
-                    $j("#import_form_product_import_rows_count").html(response.rows_count);
-                    $j("#import_form_product_upload_info").fadeIn(0);
+                    endLoading();
 
-                    checkImport({
-                        file: response.file
-                    }, {
-                        onComplete: function (response) {
-                            endLoading();
+                    // loading('Verifica del file');
+                    // $j("#import_form_product_import_file").val(response.file);
+                    // $j("#import_form_product_import_rows_count").html(response.rows_count);
+                    // $j("#import_form_product_upload_info").fadeIn(0);
 
-                            if (response.status === 'OK') {
+                    // checkImport({
+                    //     file: response.file
+                    // }, {
+                    //     onComplete: function (response) {
+                    //         endLoading();
 
-                                $j("#import_form_product_import").fadeIn(0);
-                            } else {
+                    if (response.status === 'OK') {
 
-                                // Mostro errori file
+                        $j("#import_form_product_import").fadeIn(0);
+                    } else {
 
-                                $j.each(response.errors, function (index, error) {
-                                    printError(error);
-                                });
-                            }
-                        },
-                        onError: function (response) {
-                            alert(JSON.stringify(response));
-                        }
-                    });
+                        // Mostro errori file
+
+                        $j.each(response.errors, function (index, error) {
+                            printError(error);
+                        });
+                    }
+                    // },
+                    // onError: function (response) {
+                    //     alert(JSON.stringify(response));
+                    // }
+                    // });
                 },
                 onError: function (response) {
                     alert(JSON.stringify(response));
