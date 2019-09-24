@@ -153,6 +153,7 @@
         importProductsForm.on("submit", function (e) {
 
             var formData = new FormData(this);
+            loading('');
 
             splitImport(formData, {
                 onComplete: function (response) {
