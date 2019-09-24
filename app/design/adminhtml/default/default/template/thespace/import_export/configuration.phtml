@@ -6,6 +6,20 @@
 <form id="import_form_product_upload" method="post" enctype="multipart/form-data">
     <input name="form_key" type="hidden" value="<?php echo Mage::getSingleton('core/session')->getFormKey() ?>"/>
 
+    <h4>Defaults</h4>
+    
+    <?php $configurationHelper = Mage::helper('thespaceimportexport/Configuration'); ?>
+    <?php foreach (Thespace_ImportExport_Helper_Configuration::DEFAULT_CONFIGURATION_OPTIONS as $default) : ?>
+
+        <p>
+            <label>
+                <span><?php echo ucwords(str_replace("_", " ", $default)); ?></span>
+                <input type="text" name="<?php echo $default; ?>"
+                       value="<?php echo $configurationHelper->get($default); ?>">
+            </label>
+        </p>
+    
+    <?php endforeach; ?>
 
 </form>
 

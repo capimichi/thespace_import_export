@@ -7,6 +7,9 @@ class Thespace_ImportExport_Helper_ProductParser extends Mage_Core_Helper_Abstra
     ];
     
     const REQUIRED_NEW_PRODUCT_HEADERS = [
+        'name',
+        'status',
+        'tax_class_id',
         '_type',
         '_attribute_set',
         '_product_websites',
@@ -15,6 +18,9 @@ class Thespace_ImportExport_Helper_ProductParser extends Mage_Core_Helper_Abstra
     const ARRAY_SEPARATOR = '|';
     
     const NOT_REQUIRED_HEADERS = [
+        'name',
+        'status',
+        'tax_class_id',
         'created_at',
         'links_purchased_separately',
         'links_title',
