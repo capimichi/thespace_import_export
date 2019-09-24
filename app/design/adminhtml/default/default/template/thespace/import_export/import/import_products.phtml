@@ -104,7 +104,6 @@
 
             parseImport(formData, {
                 onComplete: function (response) {
-                    endLoading();
                     $j("#import_form_product_import_file").val(response.file);
                     $j("#import_form_product_import_rows_count").html(response.rows_count);
                     $j("#import_form_product_upload_info").fadeIn(0);
@@ -113,6 +112,7 @@
                         file: response.file
                     }, {
                         onComplete: function (response) {
+                            endLoading();
 
                             if (response.status === 'OK') {
 
