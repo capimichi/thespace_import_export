@@ -31,6 +31,22 @@ class Thespace_ImportExport_ConfigurationController extends Mage_Adminhtml_Contr
         }
         
         
+        $tags = [
+            'CONFIG',
+            'LAYOUT_GENERAL_CACHE_TAG',
+//            'BLOCK_HTML',
+//            'TRANSLATE',
+//            'COLLECTION_DATA',
+//            'EAV',
+//            'CONFIG_API',
+//            'CONFIG_API2',
+        ];
+        
+        foreach ($tags as $tag) {
+            Mage::app()->getCacheInstance()->cleanType($tag);
+        }
+        
+        
         echo json_encode($response);
         die();
     }
