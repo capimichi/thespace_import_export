@@ -24,9 +24,11 @@ class Thespace_ImportExport_ConfigurationController extends Mage_Adminhtml_Contr
             'errors' => [],
         ];
         
-        $importHelper = Mage::helper('thespaceimportexport/Import');
-        $csvHelper = Mage::helper('thespaceimportexport/Csv');
-        $productParserHelper = Mage::helper('thespaceimportexport/ProductParser');
+        $configurationHelper = Mage::helper('thespaceimportexport/Configuration');
+        
+        foreach (Thespace_ImportExport_Helper_Configuration::DEFAULT_CONFIGURATION_OPTIONS as $default) {
+            $configurationHelper->set($default, isset($_GET[$default]) ? $_GET[$default] : '');
+        }
         
         
         echo json_encode($response);
