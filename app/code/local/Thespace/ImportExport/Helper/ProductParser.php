@@ -66,6 +66,8 @@ class Thespace_ImportExport_Helper_ProductParser extends Mage_Core_Helper_Abstra
         'name'                    => [
             'name',
             'nome',
+            'titolo',
+            'title',
         ],
         '_category'               => [
             'category',
@@ -112,6 +114,8 @@ class Thespace_ImportExport_Helper_ProductParser extends Mage_Core_Helper_Abstra
             'stato',
             'abilitato',
             'enabled',
+            'attivo',
+            'active',
         ],
         'qty'                     => [
             'qty',
