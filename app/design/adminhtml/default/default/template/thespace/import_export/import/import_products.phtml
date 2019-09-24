@@ -155,23 +155,18 @@
                         importGroups(groupFiles, 0, {
                             onProcess: function (response, index) {
 
-                                $j.each(response.errors, function (index, errors) {
+                                $j.each(response.errors, function (index, error) {
 
-                                    $j.each(errors, function (message, ids) {
+                                    var errorMessage = '<a href="{url}" target="_blank">{index}</a> {error}';
+                                    var url = globals.urlImportShowimportjson;
+                                    url = url.replace(/{file}/g, response.file);
 
-                                        var errorMessage = '<a href="{url}" target="_blank">{index}</a> {message}: {ids}';
-                                        var url = globals.urlImportShowimportjson;
-                                        url = url.replace(/{file}/g, response.file);
-
-                                        errorMessage = errorMessage.replace(/{url}/g, url);
-                                        errorMessage = errorMessage.replace(/{index}/g, index + 1);
-                                        errorMessage = errorMessage.replace(/{error}/g, message);
-                                        errorMessage = errorMessage.replace(/{ids}/g, JSON.stringify(ids));
-
-                                        printError(errorMessage);
-                                    });
+                                    errorMessage = errorMessage.replace(/{url}/g, url);
+                                    errorMessage = errorMessage.replace(/{index}/g, index + 1);
+                                    errorMessage = errorMessage.replace(/{error}/g, JSON.stringify(error));
 
 
+                                    printError(errorMessage);
                                 });
 
                                 var progress = 'Import in corso: {step} / {total}';
