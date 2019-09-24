@@ -95,6 +95,11 @@ class Thespace_ImportExport_ImportController extends Mage_Adminhtml_Controller_A
         $attributes = Mage::getResourceModel('catalog/product_attribute_collection')
             ->getItems();
         
+        $defaultRow = [
+            '_attribute_set'    => $configurationHelper->get(Thespace_ImportExport_Helper_Configuration::OPTION_DEFAULT_ATTRIBUTE_SET),
+            '_product_websites' => $configurationHelper->get(Thespace_ImportExport_Helper_Configuration::OPTION_DEFAULT_PRODUCT_WEBSITES),
+            'tax_class_id'      => $configurationHelper->get(Thespace_ImportExport_Helper_Configuration::OPTION_DEFAULT_TAX_CLASS_ID),
+        ];
         
         $rows = [];
         
@@ -103,11 +108,7 @@ class Thespace_ImportExport_ImportController extends Mage_Adminhtml_Controller_A
             $rowData = $productParserHelper->getDataFromRow($row, $attributes);
             
             if (!in_array($rowData['sku'], $existingSkus)) {
-                $defaultRow = [
-                    '_attribute_set'    => $configurationHelper->get(Thespace_ImportExport_Helper_Configuration::OPTION_DEFAULT_ATTRIBUTE_SET),
-                    '_product_websites' => $configurationHelper->get(Thespace_ImportExport_Helper_Configuration::OPTION_DEFAULT_PRODUCT_WEBSITES),
-                    'tax_class_id'      => $configurationHelper->get(Thespace_ImportExport_Helper_Configuration::OPTION_DEFAULT_TAX_CLASS_ID),
-                ];
+                
                 $row = array_merge($defaultRow, $row);
             }
             
@@ -159,6 +160,12 @@ class Thespace_ImportExport_ImportController extends Mage_Adminhtml_Controller_A
         $attributes = Mage::getResourceModel('catalog/product_attribute_collection')
             ->getItems();
         
+        $defaultRow = [
+            '_attribute_set'    => $configurationHelper->get(Thespace_ImportExport_Helper_Configuration::OPTION_DEFAULT_ATTRIBUTE_SET),
+            '_product_websites' => $configurationHelper->get(Thespace_ImportExport_Helper_Configuration::OPTION_DEFAULT_PRODUCT_WEBSITES),
+            'tax_class_id'      => $configurationHelper->get(Thespace_ImportExport_Helper_Configuration::OPTION_DEFAULT_TAX_CLASS_ID),
+        ];
+        
         $now = new DateTime('now');
         
         $importDirectory = implode(DIRECTORY_SEPARATOR, [
@@ -185,11 +192,6 @@ class Thespace_ImportExport_ImportController extends Mage_Adminhtml_Controller_A
                     $rowData = $productParserHelper->getDataFromRow($row, $attributes);
                     
                     if (!in_array($rowData['sku'], $existingSkus)) {
-                        $defaultRow = [
-                            '_attribute_set'    => $configurationHelper->get(Thespace_ImportExport_Helper_Configuration::OPTION_DEFAULT_ATTRIBUTE_SET),
-                            '_product_websites' => $configurationHelper->get(Thespace_ImportExport_Helper_Configuration::OPTION_DEFAULT_PRODUCT_WEBSITES),
-                            'tax_class_id'      => $configurationHelper->get(Thespace_ImportExport_Helper_Configuration::OPTION_DEFAULT_TAX_CLASS_ID),
-                        ];
                         $row = array_merge($defaultRow, $row);
                     }
                     
