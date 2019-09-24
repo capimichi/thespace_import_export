@@ -256,15 +256,17 @@ class Thespace_ImportExport_Helper_ProductParser extends Mage_Core_Helper_Abstra
      */
     public function getDataFromRow($row, $attributes = null, $categoryPathNames = null)
     {
+        $configurationHelper = Mage::helper('thespaceimportexport/Configuration');
+        
         if (is_null($attributes)) {
             $attributes = Mage::getResourceModel('catalog/product_attribute_collection')
                 ->getItems();
         }
         
         $defaultRow = [
-            '_attribute_set'    => Thespace_ImportExport_Helper_Configuration::OPTION_DEFAULT_ATTRIBUTE_SET,
-            '_product_websites' => Thespace_ImportExport_Helper_Configuration::OPTION_DEFAULT_PRODUCT_WEBSITES,
-            'tax_class_id'      => Thespace_ImportExport_Helper_Configuration::OPTION_DEFAULT_TAX_CLASS_ID,
+            '_attribute_set'    => $configurationHelper->get(Thespace_ImportExport_Helper_Configuration::OPTION_DEFAULT_ATTRIBUTE_SET),
+            '_product_websites' => $configurationHelper->get(Thespace_ImportExport_Helper_Configuration::OPTION_DEFAULT_PRODUCT_WEBSITES),
+            'tax_class_id'      => $configurationHelper->get(Thespace_ImportExport_Helper_Configuration::OPTION_DEFAULT_TAX_CLASS_ID),
         ];
         
         $row = array_merge($defaultRow, $row);
