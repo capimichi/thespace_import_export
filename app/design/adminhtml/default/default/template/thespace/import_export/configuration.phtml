@@ -3,7 +3,7 @@
 <script src="https://cdn.jsdelivr.net/gh/vadimsva/waitMe/waitMe.min.js"></script>
 
 <h2>Configurazione</h2>
-<form id="import_form_product_upload" method="post" enctype="multipart/form-data">
+<form id="configuration_form" method="post" enctype="multipart/form-data">
     <input name="form_key" type="hidden" value="<?php echo Mage::getSingleton('core/session')->getFormKey() ?>"/>
 
     <h4>Defaults</h4>
@@ -21,5 +21,31 @@
     
     <?php endforeach; ?>
 
+    <button type="submit">Salva</button>
 </form>
 
+<script>
+
+    $j = jQuery.noConflict();
+
+    $j(function () {
+
+
+        var form = $j("#configuration_form");
+        form.on("submit", function () {
+            var data = $j(this).serialize();
+            saveData(data)
+                .done(function (response) {
+                    alert('Salvato');
+                });
+        });
+
+        function saveData(data) {
+            return $j.ajax({
+                url: '<?php echo Mage::helper("adminhtml")->getUrl("thespaceimportexport/import/ajaximportcheck"); ?>?isAjax=true',
+                data: data
+            });
+        }
+    });
+
+</script>
