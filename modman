@@ -4,6 +4,7 @@ app/code/local/Thespace/ImportExport            app/code/local/Thespace/ImportEx
 # app/etc
 app/etc/modules/Thespace_ImportExport.xml            app/etc/modules/Thespace_ImportExport.xml
 # app/design
+app/design/adminhtml/default/default/template/thespace/import_export/configuration.phtml            app/design/adminhtml/default/default/template/thespace/import_export/configuration.phtml
 app/design/adminhtml/default/default/template/thespace/import_export/export/export_products.phtml            app/design/adminhtml/default/default/template/thespace/import_export/export/export_products.phtml
 app/design/adminhtml/default/default/template/thespace/import_export/export/export_categories.phtml            app/design/adminhtml/default/default/template/thespace/import_export/export/export_categories.phtml
 app/design/adminhtml/default/default/template/thespace/import_export/import/configurable.phtml            app/design/adminhtml/default/default/template/thespace/import_export/import/configurable.phtml

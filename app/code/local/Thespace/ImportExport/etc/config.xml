@@ -67,6 +67,10 @@
                             </menu_ts_import_export_export_categories>
                         </children>
                     </menu_ts_import_export_export>
+                    <menu_ts_import_export_configuration module="ImportExport">
+                        <title>Configurazione</title>
+                        <action>thespaceimportexport/configuration</action>
+                    </menu_ts_import_export_configuration>
                 </children>
             </menu_ts_import_export>
         </menu>
