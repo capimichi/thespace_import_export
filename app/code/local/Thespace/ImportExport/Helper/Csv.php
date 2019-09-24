@@ -14,6 +14,7 @@ class Thespace_ImportExport_Helper_Csv extends Mage_Core_Helper_Abstract
             $row = fgetcsv($f);
             $item = [];
             foreach ($headers as $key => $headerName) {
+                $headerName = strtolower($headerName);
                 $item[$headerName] = $row[$key];
             }
             if (!feof($f)) {
