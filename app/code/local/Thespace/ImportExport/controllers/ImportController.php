@@ -250,6 +250,7 @@ class Thespace_ImportExport_ImportController extends Mage_Adminhtml_Controller_A
         $groupIndex = $_POST['group'];
         $response['group'] = $groupIndex;
         $filePath = $_POST['file'];
+        $response['file'] = $filePath;
         $dataGroup = json_decode(file_get_contents($filePath), true);
         $imageReplace = !empty($_POST['image_replace']);
 
