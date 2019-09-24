@@ -91,20 +91,29 @@ class Thespace_ImportExport_ImportController extends Mage_Adminhtml_Controller_A
         $index = 0;
         $rowIndex = 1;
         
+        $existingSkus = $skuHelper->getExistingSkus();
+        $attributes = Mage::getResourceModel('catalog/product_attribute_collection')
+            ->getItems();
+        
+        
         $rows = [];
         
         foreach ($csvHelper->getRows($filePath) as $row) {
-
-//            $defaultRow = [
-//                '_attribute_set'    => $configurationHelper->get(Thespace_ImportExport_Helper_Configuration::OPTION_DEFAULT_ATTRIBUTE_SET),
-//                '_product_websites' => $configurationHelper->get(Thespace_ImportExport_Helper_Configuration::OPTION_DEFAULT_PRODUCT_WEBSITES),
-//                'tax_class_id'      => $configurationHelper->get(Thespace_ImportExport_Helper_Configuration::OPTION_DEFAULT_TAX_CLASS_ID),
-//            ];
-//            $row = array_merge($defaultRow, $row);
+            
+            $rowData = $productParserHelper->getDataFromRow($row, $attributes);
+            
+            if (!in_array($rowData['sku'], $existingSkus)) {
+                $defaultRow = [
+                    '_attribute_set'    => $configurationHelper->get(Thespace_ImportExport_Helper_Configuration::OPTION_DEFAULT_ATTRIBUTE_SET),
+                    '_product_websites' => $configurationHelper->get(Thespace_ImportExport_Helper_Configuration::OPTION_DEFAULT_PRODUCT_WEBSITES),
+                    'tax_class_id'      => $configurationHelper->get(Thespace_ImportExport_Helper_Configuration::OPTION_DEFAULT_TAX_CLASS_ID),
+                ];
+                $row = array_merge($defaultRow, $row);
+            }
+            
             $rows[] = $row;
         }
         
-        $existingSkus = $skuHelper->getExistingSkus();
         
         $missingHeaderRows = $productParserHelper->getMissingHeadersInRows($rows, $existingSkus);
         
@@ -140,9 +149,15 @@ class Thespace_ImportExport_ImportController extends Mage_Adminhtml_Controller_A
         $filePath = $_POST['file'];
         $stepRows = $_POST['step_rows'];
         
+        $configurationHelper = Mage::helper('thespaceimportexport/Configuration');
+        $skuHelper = Mage::helper('thespaceimportexport/Sku');
         $importHelper = Mage::helper('thespaceimportexport/Import');
         $csvHelper = Mage::helper('thespaceimportexport/Csv');
         $productParserHelper = Mage::helper('thespaceimportexport/ProductParser');
+        
+        $existingSkus = $skuHelper->getExistingSkus();
+        $attributes = Mage::getResourceModel('catalog/product_attribute_collection')
+            ->getItems();
         
         $now = new DateTime('now');
         
@@ -165,7 +180,23 @@ class Thespace_ImportExport_ImportController extends Mage_Adminhtml_Controller_A
             
             if (is_writable($importDirectory)) {
                 
-                $dataItems = $productParserHelper->getDataFromRows($csvHelper->getRows($filePath));
+                $rows = [];
+                foreach ($csvHelper->getRows($filePath) as $row) {
+                    $rowData = $productParserHelper->getDataFromRow($row, $attributes);
+                    
+                    if (!in_array($rowData['sku'], $existingSkus)) {
+                        $defaultRow = [
+                            '_attribute_set'    => $configurationHelper->get(Thespace_ImportExport_Helper_Configuration::OPTION_DEFAULT_ATTRIBUTE_SET),
+                            '_product_websites' => $configurationHelper->get(Thespace_ImportExport_Helper_Configuration::OPTION_DEFAULT_PRODUCT_WEBSITES),
+                            'tax_class_id'      => $configurationHelper->get(Thespace_ImportExport_Helper_Configuration::OPTION_DEFAULT_TAX_CLASS_ID),
+                        ];
+                        $row = array_merge($defaultRow, $row);
+                    }
+                    
+                    $rows[] = $row;
+                }
+                
+                $dataItems = $productParserHelper->getDataFromRows($rows);
                 $dataItems = $productParserHelper->applyParentCells($dataItems);
 //                $dataItems = $productParserHelper->applyImagesCells($dataItems, [
 //                    'advanced' => 0,
