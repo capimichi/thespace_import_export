@@ -126,13 +126,13 @@
                                 var content = "";
 
                                 $j.each(response.errors, function (index, error) {
-                                    var row = table.data('template-row');
+                                    var row = errorsTable.data('template-row');
                                     row = row.replace(/{row}/g, error);
                                     content += row;
                                 });
 
-                                table.find("tbody").html(content);
-                                table.fadeIn(0);
+                                errorsTable.find("tbody").html(content);
+                                errorsTable.fadeIn(0);
                             }
                         },
                         onError: function (response) {
