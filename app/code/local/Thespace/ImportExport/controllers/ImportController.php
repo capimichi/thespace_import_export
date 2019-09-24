@@ -275,6 +275,7 @@ class Thespace_ImportExport_ImportController extends Mage_Adminhtml_Controller_A
             
             $import->processProductImport($dataGroup);
         } catch (Exception $e) {
+            $response['status'] = 'ERROR';
             $error = [
                 'errors' => $import->getErrorMessages(),
             ];
