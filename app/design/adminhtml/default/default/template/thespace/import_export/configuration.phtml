@@ -13,7 +13,11 @@
 
         <p>
             <label>
-                <span><?php echo ucwords(str_replace("_", " ", $default)); ?></span>
+                <?php
+                $tmp = explode("/", $default);
+                $label = ucwords(str_replace("_", " ", array_pop($tmp)))
+                ?>
+                <span><?php echo $label; ?></span>
                 <input type="text" name="<?php echo $default; ?>"
                        value="<?php echo $configurationHelper->get($default); ?>">
             </label>
