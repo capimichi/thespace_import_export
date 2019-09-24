@@ -162,6 +162,7 @@
 
                         importGroups(groupFiles, 0, {
                             onProcess: function (response, index) {
+                                console.log(response);
                                 var progress = 'Import in corso: {step} / {total}';
                                 progress = progress.replace(/{step}/g, index + 1);
                                 progress = progress.replace(/{total}/g, groupFiles.length);
