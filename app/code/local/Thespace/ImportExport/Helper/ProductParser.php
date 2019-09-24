@@ -556,34 +556,37 @@ class Thespace_ImportExport_Helper_ProductParser extends Mage_Core_Helper_Abstra
             foreach ($dataItems as $key => $dataItem) {
                 
                 $images = $dataItem['image'];
-                if (!is_array($images)) {
-                    $images = [$images];
-                }
                 
-                $_mediaImages = [];
-                $_mediaLabels = [];
-                $_mediaIsDisableds = [];
-                $_mediaAttributeIds = [];
-                $_mediaPositions = [];
-                $index = 0;
-                foreach ($images as $image) {
-                    $image = $imageHelper->storeImage($image);
-                    $_mediaImages[] = basename($image);;
-                    $_mediaLabels[] = basename($image);;
-                    $_mediaIsDisableds[] = 0;
-                    $_mediaAttributeIds[] = $options['media_attribute_id'];
-                    $_mediaPositions[] = $index;
-                    $dataItems[$key]['image'] = basename($image);
-                    $dataItems[$key]['small_image'] = basename($image);;
-                    $dataItems[$key]['thumbnail'] = basename($image);;
-                    $index++;
+                if (!is_null($images)) {
+                    if (!is_array($images)) {
+                        $images = [$images];
+                    }
+                    
+                    $_mediaImages = [];
+                    $_mediaLabels = [];
+                    $_mediaIsDisableds = [];
+                    $_mediaAttributeIds = [];
+                    $_mediaPositions = [];
+                    $index = 0;
+                    foreach ($images as $image) {
+                        $image = $imageHelper->storeImage($image);
+                        $_mediaImages[] = basename($image);;
+                        $_mediaLabels[] = basename($image);;
+                        $_mediaIsDisableds[] = 0;
+                        $_mediaAttributeIds[] = $options['media_attribute_id'];
+                        $_mediaPositions[] = $index;
+                        $dataItems[$key]['image'] = basename($image);
+                        $dataItems[$key]['small_image'] = basename($image);;
+                        $dataItems[$key]['thumbnail'] = basename($image);;
+                        $index++;
+                    }
+                    
+                    $dataItems[$key]['_media_image'] = $_mediaImages;
+                    $dataItems[$key]['_media_attribute_id'] = $_mediaAttributeIds;
+                    $dataItems[$key]['_media_is_disabled'] = $_mediaIsDisableds;
+                    $dataItems[$key]['_media_position'] = $_mediaPositions;
+                    $dataItems[$key]['_media_lable'] = $_mediaLabels;
                 }
-                
-                $dataItems[$key]['_media_image'] = $_mediaImages;
-                $dataItems[$key]['_media_attribute_id'] = $_mediaAttributeIds;
-                $dataItems[$key]['_media_is_disabled'] = $_mediaIsDisableds;
-                $dataItems[$key]['_media_position'] = $_mediaPositions;
-                $dataItems[$key]['_media_lable'] = $_mediaLabels;
             }
         }
         
