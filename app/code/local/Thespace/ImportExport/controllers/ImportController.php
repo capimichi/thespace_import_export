@@ -353,4 +353,20 @@ class Thespace_ImportExport_ImportController extends Mage_Adminhtml_Controller_A
         die();
     }
     
+    public function showimportjsonAction()
+    {
+        header('Content-Type: application/json');
+        
+        $file = $_GET['file'];
+        
+        if (
+            file_exists($file)
+            && preg_match("/\.json$/is", $file)
+        ) {
+            echo file_get_contents($file);
+        }
+        
+        die();
+    }
+    
 }

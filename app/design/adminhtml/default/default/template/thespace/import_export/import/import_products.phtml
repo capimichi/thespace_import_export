@@ -7,6 +7,7 @@
      data-url-import-parse="<?php echo Mage::helper("adminhtml")->getUrl("thespaceimportexport/import/ajaximportparse"); ?>?isAjax=true&form_key=<?php echo Mage::getSingleton('core/session')->getFormKey() ?>"
      data-url-import-check="<?php echo Mage::helper("adminhtml")->getUrl("thespaceimportexport/import/ajaximportcheck"); ?>?isAjax=true&form_key=<?php echo Mage::getSingleton('core/session')->getFormKey() ?>"
      data-url-import-run="<?php echo Mage::helper("adminhtml")->getUrl("thespaceimportexport/import/ajaximportrun"); ?>?isAjax=true&form_key=<?php echo Mage::getSingleton('core/session')->getFormKey() ?>"
+     data-url-import-showimportjson="<?php echo Mage::helper("adminhtml")->getUrl("thespaceimportexport/import/showimportjson"); ?>?form_key=<?php echo Mage::getSingleton('core/session')->getFormKey() ?>&file={file}"
      data-form-key="<?php echo Mage::getSingleton('core/session')->getFormKey() ?>"
 >
     <h2>Caricamento prodotti</h2>
@@ -155,7 +156,16 @@
                             onProcess: function (response, index) {
 
                                 $j.each(response.errors, function (index, error) {
-                                    printError((index + 1) + " - " + JSON.stringify(error));
+
+                                    var errorMessage = '<a href="{url}" target="_blank">{index}</a> {error}';
+                                    var url = globals.urlImportShowimportjson;
+                                    url = url.replace(/{file}/g, response.file);
+
+                                    errorMessage = errorMessage.replace(/{url}/g, url);
+                                    errorMessage = errorMessage.replace(/{index}/g, index + 1);
+                                    errorMessage = errorMessage.replace(/{error}/g, JSON.stringify(error));
+
+                                    printError(errorMessage);
                                 });
 
                                 var progress = 'Import in corso: {step} / {total}';
