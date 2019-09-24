@@ -121,8 +121,6 @@
 
                                 // Mostro errori file
 
-                                var content = "";
-
                                 $j.each(response.errors, function (index, error) {
                                     printError(error);
                                 });
@@ -155,7 +153,11 @@
 
                         importGroups(groupFiles, 0, {
                             onProcess: function (response, index) {
-                                console.log(response);
+
+                                $j.each(response.errors, function (index, error) {
+                                    printError(error);
+                                });
+
                                 var progress = 'Import in corso: {step} / {total}';
                                 progress = progress.replace(/{step}/g, index + 1);
                                 progress = progress.replace(/{total}/g, groupFiles.length);
