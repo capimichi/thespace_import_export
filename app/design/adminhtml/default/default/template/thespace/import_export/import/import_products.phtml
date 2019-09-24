@@ -157,7 +157,7 @@
                         importGroups(groupFiles, 0, {
                             onProcess: function (response, index) {
 
-                                $j.each(response.errors, function (index, error) {
+                                $j.each(response.errors, function (k, error) {
 
                                     var errorMessage = '<a href="{url}" target="_blank">{index}</a> {error}';
                                     var url = globals.urlImportShowimportjson;
