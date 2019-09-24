@@ -44,7 +44,7 @@
 
         function saveData(data) {
             return $j.ajax({
-                url: '<?php echo Mage::helper("adminhtml")->getUrl("thespaceimportexport/import/ajaximportcheck"); ?>?isAjax=true',
+                url: '<?php echo Mage::helper("adminhtml")->getUrl("thespaceimportexport/configuration/update"); ?>?isAjax=true',
                 data: data
             });
         }
