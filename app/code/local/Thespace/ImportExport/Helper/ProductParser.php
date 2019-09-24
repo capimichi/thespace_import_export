@@ -261,6 +261,14 @@ class Thespace_ImportExport_Helper_ProductParser extends Mage_Core_Helper_Abstra
                 ->getItems();
         }
         
+        $defaultRow = [
+            '_attribute_set'    => Thespace_ImportExport_Helper_Configuration::OPTION_DEFAULT_ATTRIBUTE_SET,
+            '_product_websites' => Thespace_ImportExport_Helper_Configuration::OPTION_DEFAULT_PRODUCT_WEBSITES,
+            'tax_class_id'      => Thespace_ImportExport_Helper_Configuration::OPTION_DEFAULT_TAX_CLASS_ID,
+        ];
+        
+        $row = array_merge($defaultRow, $row);
+        
         $data = [];
         
         $associations = array_merge(

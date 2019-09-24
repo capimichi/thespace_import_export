@@ -81,6 +81,7 @@ class Thespace_ImportExport_ImportController extends Mage_Adminhtml_Controller_A
             'errors' => [],
         ];
         
+        $configurationHelper = Mage::helper('thespaceimportexport/Configuration');
         $skuHelper = Mage::helper('thespaceimportexport/Sku');
         $csvHelper = Mage::helper('thespaceimportexport/Csv');
         $productParserHelper = Mage::helper('thespaceimportexport/ProductParser');
@@ -93,6 +94,14 @@ class Thespace_ImportExport_ImportController extends Mage_Adminhtml_Controller_A
         $rows = [];
         
         foreach ($csvHelper->getRows($filePath) as $row) {
+            
+            $defaultRow = [
+                '_attribute_set'    => Thespace_ImportExport_Helper_Configuration::OPTION_DEFAULT_ATTRIBUTE_SET,
+                '_product_websites' => Thespace_ImportExport_Helper_Configuration::OPTION_DEFAULT_PRODUCT_WEBSITES,
+                'tax_class_id'      => Thespace_ImportExport_Helper_Configuration::OPTION_DEFAULT_TAX_CLASS_ID,
+            ];
+            
+            $row = array_merge($defaultRow, $row);
             $rows[] = $row;
         }
         
