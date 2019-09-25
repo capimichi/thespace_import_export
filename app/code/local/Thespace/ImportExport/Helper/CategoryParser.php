@@ -61,6 +61,7 @@ class Thespace_ImportExport_Helper_CategoryParser extends Mage_Core_Helper_Abstr
     {
         $path = $category->getPath();
         $path = explode('/', $path);
+        array_shift($path);
         
         $path = array_map(function ($item) use ($categoryNames) {
             if (!is_array($categoryNames) || !isset($categoryNames[$item])) {
@@ -71,7 +72,7 @@ class Thespace_ImportExport_Helper_CategoryParser extends Mage_Core_Helper_Abstr
             }
             return $item;
         }, $path);
-        array_shift($path);
+        
         $path = implode("/", $path);
         
         return $path;
