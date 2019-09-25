@@ -50,7 +50,8 @@ class Thespace_ImportExport_Helper_CategoryParser extends Mage_Core_Helper_Abstr
         
         $categoryNames = [];
         foreach ($categories as $category) {
-            $categoryNames[$category->getId()] = str_replace("/", "\/", $category->getName());
+//            $categoryNames[$category->getId()] = str_replace("/", "\/", $category->getName());
+            $categoryNames[$category->getId()] = $category->getName();
         }
         
         return $categoryNames;
