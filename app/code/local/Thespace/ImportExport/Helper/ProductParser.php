@@ -586,6 +586,8 @@ class Thespace_ImportExport_Helper_ProductParser extends Mage_Core_Helper_Abstra
                     $dataItems[$key]['_media_is_disabled'] = $_mediaIsDisableds;
                     $dataItems[$key]['_media_position'] = $_mediaPositions;
                     $dataItems[$key]['_media_lable'] = $_mediaLabels;
+                } else {
+                    unset($dataItems[$key]['image']);
                 }
             }
         }
