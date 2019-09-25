@@ -557,7 +557,7 @@ class Thespace_ImportExport_Helper_ProductParser extends Mage_Core_Helper_Abstra
                 
                 $images = $dataItem['image'];
                 
-                if (!is_null($images)) {
+                if (!empty($images)) {
                     if (!is_array($images)) {
                         $images = [$images];
                     }
