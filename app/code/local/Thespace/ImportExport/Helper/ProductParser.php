@@ -153,6 +153,8 @@ class Thespace_ImportExport_Helper_ProductParser extends Mage_Core_Helper_Abstra
         '_attribute_set',
         '_product_websites',
         '_store',
+        'parent',
+        'variation_attributes',
     ];
     
     const STOCK_CSV_HEADERS = [
@@ -231,6 +233,29 @@ class Thespace_ImportExport_Helper_ProductParser extends Mage_Core_Helper_Abstra
                     if ($storeView) {
                         $value = $storeView->getCode();
                     }
+                    break;
+                case "parent":
+                    $value = "";
+                    if ($product->getTypeId() == "simple") {
+                        $parentIds = Mage::getModel('catalog/product_type_grouped')->getParentIdsByChild($product->getId());
+                        if (!$parentIds) {
+                            $parentIds = Mage::getModel('catalog/product_type_configurable')->getParentIdsByChild($product->getId());
+                        }
+                        if (isset($parentIds[0])) {
+                            $parent = Mage::getModel('catalog/product')->load($parentIds[0]);
+                            $value = $parent->getSku();
+                        }
+                    }
+                    break;
+                case "variation_attributes":
+                    $usedProductAttributeCodes = [];
+                    if ($product->getTypeId() == "configurable") {
+                        $usedProductAttributes = $product->getTypeInstance()->getUsedProductAttributes($product);
+                        foreach ($usedProductAttributes as $attribute) {
+                            $usedProductAttributeCodes[] = $attribute->getAttributeCode();
+                        }
+                    }
+                    $value = implode('|', $usedProductAttributeCodes);
                     break;
             }
             $row[$header] = $value;

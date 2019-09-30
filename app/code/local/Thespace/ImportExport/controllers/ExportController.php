@@ -27,6 +27,7 @@ class Thespace_ImportExport_ExportController extends Mage_Adminhtml_Controller_A
             'errors' => [],
         ];
         
+        $csvHelper = Mage::helper('thespaceimportexport/Csv');
         $productParserHelper = Mage::helper('thespaceimportexport/ProductParser');
         
         $file = isset($_POST['file']) ? $_POST['file'] : null;
@@ -55,7 +56,6 @@ class Thespace_ImportExport_ExportController extends Mage_Adminhtml_Controller_A
         $response['pages'] = ceil($collection->getSize() / $stepRows);
         
         $f = fopen($file, 'a');
-        
         if ($page == 1) {
             
             $productIndex = 0;
@@ -67,12 +67,48 @@ class Thespace_ImportExport_ExportController extends Mage_Adminhtml_Controller_A
                 $productIndex++;
             }
         }
+        fclose($f);
         
+        // Prima ciclo i configurabili così se hanno figli
+        // già li cavo di torno
+        
+        $f = fopen($file, 'a');
         foreach ($collection as $product) {
-            $row = $productParserHelper->getRowFromProduct($product, $storeView);
-            fputcsv($f, $row);
+            if ($product->getTypeId() == "configurable") {
+                $row = $productParserHelper->getRowFromProduct($product, $storeView);
+                fputcsv($f, $row);
+                
+                $childIds = Mage::getModel('catalog/product_type_configurable')
+                    ->getChildrenIds($product->getId());
+                foreach ($childIds as $childId) {
+                    $child = Mage::getModel('catalog/product')->load($childId);
+                    $row = $productParserHelper->getRowFromProduct($child, $storeView);
+                    fputcsv($f, $row);
+                }
+            }
         }
+        fclose($f);
         
+        // Poi raccolgo gli sku già aggiunti
+        
+        $alreadyExistingSkus = [];
+        foreach ($csvHelper->getRows($file) as $existingRow) {
+            $alreadyExistingSkus[] = $existingRow['sku'];
+        }
+        $alreadyExistingSkus = array_unique($alreadyExistingSkus);
+        
+        // Poi ciclo i semplici, controllando che non
+        // siano già stati inseriti perchè erano dei figli
+        
+        $f = fopen($file, 'a');
+        foreach ($collection as $product) {
+            if ($product->getTypeId() == "simple") {
+                if (!in_array($product->getSku(), $alreadyExistingSkus)) {
+                    $row = $productParserHelper->getRowFromProduct($product, $storeView);
+                    fputcsv($f, $row);
+                }
+            }
+        }
         fclose($f);
         
         echo json_encode($response);
