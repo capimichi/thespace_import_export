@@ -80,6 +80,7 @@ class Thespace_ImportExport_ExportController extends Mage_Adminhtml_Controller_A
                 
                 $childIds = Mage::getModel('catalog/product_type_configurable')
                     ->getChildrenIds($product->getId());
+                $childIds = $childIds[0];
                 foreach ($childIds as $childId) {
                     $child = Mage::getModel('catalog/product')->load($childId);
                     $row = $productParserHelper->getRowFromProduct($child, $storeView);
