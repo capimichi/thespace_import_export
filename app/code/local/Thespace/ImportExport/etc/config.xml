@@ -52,6 +52,10 @@
                                 <title>Upload immagini</title>
                                 <action>thespaceimportexport/images</action>
                             </menu_ts_import_export_import_images>
+                            <menu_ts_import_export_import_cron_products module="ImportExport">
+                                <title>Import prodotti cron</title>
+                                <action>thespaceimportexport/cronimport</action>
+                            </menu_ts_import_export_import_cron_products>
                         </children>
                     </menu_ts_import_export_import>
                     <menu_ts_import_export_export module="ImportExport">

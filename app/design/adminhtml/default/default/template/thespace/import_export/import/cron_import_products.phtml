@@ -10,7 +10,7 @@
      data-url-import-showimportjson="<?php echo Mage::helper("adminhtml")->getUrl("thespaceimportexport/import/showimportjson"); ?>?form_key=<?php echo Mage::getSingleton('core/session')->getFormKey() ?>&file={file}"
      data-form-key="<?php echo Mage::getSingleton('core/session')->getFormKey() ?>"
 >
-    <h2>Caricamento prodotti</h2>
+    <h2>Caricamento prodotti a cron</h2>
     <form id="import_form_product_upload" method="post" enctype="multipart/form-data">
         <input name="form_key" type="hidden" value="<?php echo Mage::getSingleton('core/session')->getFormKey() ?>"/>
 
@@ -28,66 +28,7 @@
         </div>
     </form>
     <p></p>
-
-    <form id="import_form_product_import" method="post" style="display: none;">
-        <input name="form_key" type="hidden" value="<?php echo Mage::getSingleton('core/session')->getFormKey() ?>"/>
-        <input id="import_form_product_import_file" name="file" type="hidden" value=""/>
-
-        <p>
-            <label> Righe per volta <input id="step_rows" type="text" value="50" name="step_rows"></label>
-        </p>
-<!--        <p>-->
-        <!--            <label> Gestione avanzata immagini <input type="checkbox" value="1" name="image_advanced"></label>-->
-        <!--        </p>-->
-        <!--        <p>-->
-        <!--            <label> Sostituzione immagini <input type="checkbox" value="1" name="image_replace"></label>-->
-        <!--        </p>-->
-        <p id="progress_status">
-
-        </p>
-
-        <button type="submit">Importa</button>
-    </form>
-    <p></p>
-
-    <table id="import_table_product_errors" style="display: none;"
-           data-template-row="<tr><td>{row}</td></tr>">
-        <thead>
-        <tr>
-            <th>Errori</th>
-        </tr>
-        </thead>
-        <tbody>
-        </tbody>
-    </table>
-
 </div>
-
-<style>
-
-    table {
-        border-collapse: collapse;
-    }
-
-    table, th, td {
-        border: 1px solid black;
-    }
-
-    #import_table_product_errors {
-        width: 100%;
-        max-height: 400px;
-        border: none;
-        display: block;
-        overflow: scroll;
-        border-collapse: collapse;
-    }
-
-    #import_table_product_errors th,
-    #import_table_product_errors td {
-        border: 1px solid grey;
-        padding: 5px;
-    }
-</style>
 
 <script>
 
