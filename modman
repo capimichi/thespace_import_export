@@ -8,5 +8,8 @@ app/design/adminhtml/default/default/template/thespace/import_export/configurati
 app/design/adminhtml/default/default/template/thespace/import_export/export/export_products.phtml            app/design/adminhtml/default/default/template/thespace/import_export/export/export_products.phtml
 app/design/adminhtml/default/default/template/thespace/import_export/export/export_categories.phtml            app/design/adminhtml/default/default/template/thespace/import_export/export/export_categories.phtml
 app/design/adminhtml/default/default/template/thespace/import_export/import/configurable.phtml            app/design/adminhtml/default/default/template/thespace/import_export/import/configurable.phtml
+app/design/adminhtml/default/default/template/thespace/import_export/import/cron_import_products.phtml            app/design/adminhtml/default/default/template/thespace/import_export/import/cron_import_products.phtml
 app/design/adminhtml/default/default/template/thespace/import_export/import/import_products.phtml            app/design/adminhtml/default/default/template/thespace/import_export/import/import_products.phtml
 app/design/adminhtml/default/default/template/thespace/import_export/import/upload_images.phtml            app/design/adminhtml/default/default/template/thespace/import_export/import/upload_images.phtml
+# shell
+shell/thespace_import_export_cron_import.php            shell/thespace_import_export_cron_import.php
