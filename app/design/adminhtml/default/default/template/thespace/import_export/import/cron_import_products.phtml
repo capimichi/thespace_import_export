@@ -24,7 +24,7 @@
             Mese
             <select name="month">
                 <?php foreach (range(1, 12) as $month) : ?>
-                    <option <?php echo $month == intval(date('m')) ? 'checked="checked"' : ''; ?>
+                    <option <?php echo $month == intval(date('m')) ? 'selected="selected"' : ''; ?>
                             value="<?php echo $month; ?>"><?php echo $month; ?></option>
                 <?php endforeach; ?>
             </select>
@@ -33,7 +33,7 @@
             Giorno
             <select name="month">
                 <?php foreach (range(1, 31) as $day) : ?>
-                    <option <?php echo $day == intval(date('d')) ? 'checked="checked"' : ''; ?>
+                    <option <?php echo $day == intval(date('d')) ? 'selected="selected"' : ''; ?>
                             value="<?php echo $day; ?>"><?php echo $day; ?></option>
                 <?php endforeach; ?>
             </select>
@@ -42,7 +42,7 @@
             Ora
             <select name="month">
                 <?php foreach (range(1, 24) as $hour) : ?>
-                    <option <?php echo $hour == intval(date('H')) ? 'checked="checked"' : ''; ?>
+                    <option <?php echo $hour == intval(date('H')) ? 'selected="selected"' : ''; ?>
                             value="<?php echo $hour; ?>"><?php echo $hour; ?></option>
                 <?php endforeach; ?>
             </select>
@@ -51,7 +51,7 @@
             Minuto
             <select name="month">
                 <?php foreach (range(1, 60) as $minute) : ?>
-                    <option <?php echo $minute == intval(date('i')) ? 'checked="checked"' : ''; ?>
+                    <option <?php echo $minute == intval(date('i')) ? 'selected="selected"' : ''; ?>
                             value="<?php echo $minute; ?>"><?php echo $minute; ?></option>
                 <?php endforeach; ?>
             </select>
