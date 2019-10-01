@@ -150,7 +150,7 @@
                     $j.each(files, function (key, fileItem) {
                         var row = cronItemsTable.data('template-row');
                         row = row.replace(/{file}/g, fileItem.name);
-                        var dateString = "{year}/{month}/{day} {hour}:{minute}";
+                        var dateString = "{year}-{month}-{day} {hour}:{minute}";
                         dateString = dateString.replace(/{year}/g, fileItem.date.Y);
                         dateString = dateString.replace(/{month}/g, fileItem.date.M);
                         dateString = dateString.replace(/{day}/g, fileItem.date.d);
