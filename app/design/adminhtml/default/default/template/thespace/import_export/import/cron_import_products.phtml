@@ -66,7 +66,7 @@
     <p></p>
 
     <table id="import_table_product_cron"
-           data-template-row="<tr><td>{file}</td><td>{time}</td><td><button data-file='{file}'>X</button></td></tr>">
+           data-template-row="<tr><td>{file}</td><td>{time}</td><td><button class='remove-button' data-file='{file}'>X</button></td></tr>">
         <thead>
         <tr>
             <th>File</th>
@@ -114,18 +114,19 @@
         var globals = $j("#import_products").data();
         var cronItemsTable = $j("#import_table_product_cron");
 
-        getCronItems()
-            .done(function (response) {
-                var files = response.files;
-                var html = "";
-                $j.each(files, function (key, fileItem) {
-                    var row = cronItemsTable.data('template-row');
-                    row = row.replace(/{file}/g, fileItem.name);
-                    row = row.replace(/{time}/g, JSON.stringify(fileItem.time));
-                    html += row;
+        updateCronList();
+
+        $j("body").on("click", ".remove-button", function () {
+            var t = $j(this);
+
+            removeCronItem({
+                name: t.data('name')
+            })
+                .done(function (response) {
+                    updateCronList();
                 });
-                cronItemsTable.find('tbody').html(html);
-            });
+
+        });
 
         $j("#import_form_product_upload").on("submit", function (e) {
 
@@ -135,49 +136,27 @@
 
             addCronItem(formData)
                 .done(function (response) {
-                    alert('Si');
+                    endLoading();
+                    updateCronList();
                 });
-
-            // parseImport(formData, {
-            //     onComplete: function (response) {
-            //
-            //         endLoading();
-            //
-            //         // loading('Verifica del file');
-            //         $j("#import_form_product_import_file").val(response.file);
-            //         $j("#import_form_product_import_rows_count").html(response.rows_count);
-            //         $j("#import_form_product_upload_info").fadeIn(0);
-            //
-            //         // checkImport({
-            //         //     file: response.file
-            //         // }, {
-            //         //     onComplete: function (response) {
-            //         //         endLoading();
-            //
-            //         if (response.status === 'OK') {
-            //
-            //             $j("#import_form_product_import").fadeIn(0);
-            //         } else {
-            //
-            //             // Mostro errori file
-            //
-            //             $j.each(response.errors, function (index, error) {
-            //                 printError(error);
-            //             });
-            //         }
-            //         // },
-            //         // onError: function (response) {
-            //         //     alert(JSON.stringify(response));
-            //         // }
-            //         // });
-            //     },
-            //     onError: function (response) {
-            //         alert(JSON.stringify(response));
-            //     }
-            // });
 
             e.preventDefault();
         });
+
+        function updateCronList() {
+            getCronItems()
+                .done(function (response) {
+                    var files = response.files;
+                    var html = "";
+                    $j.each(files, function (key, fileItem) {
+                        var row = cronItemsTable.data('template-row');
+                        row = row.replace(/{file}/g, fileItem.name);
+                        row = row.replace(/{time}/g, JSON.stringify(fileItem.time));
+                        html += row;
+                    });
+                    cronItemsTable.find('tbody').html(html);
+                });
+        }
 
         // var importProductsForm = $j("#import_form_product_import");
         //
@@ -258,6 +237,14 @@
             return $j.ajax({
                 url: globals.urlCronList,
                 method: 'get'
+            });
+        }
+
+        function removeCronItem(data) {
+            return $j.ajax({
+                url: globals.urlCronRemove,
+                method: 'post',
+                data: data
             });
         }
 
