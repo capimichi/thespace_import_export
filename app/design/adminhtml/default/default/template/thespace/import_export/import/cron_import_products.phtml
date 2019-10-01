@@ -13,6 +13,51 @@
         <input name="form_key" type="hidden" value="<?php echo Mage::getSingleton('core/session')->getFormKey() ?>"/>
 
         <label>
+            Anno
+            <select name="year">
+                <?php foreach (range(date('Y'), intval(date('Y')) + 10)) as $year : ?>
+                <option value="<?php echo $year; ?>"><?php echo $year; ?></option>
+                <?php endforeach; ?>
+            </select>
+        </label>
+        <label>
+            Mese
+            <select name="month">
+                <?php foreach (1, 12) as $month : ?>
+                <option <?php echo $month == intval(date('m')) ? 'checked="checked"' : ''; ?>
+                        value="<?php echo $month; ?>"><?php echo $month; ?></option>
+                <?php endforeach; ?>
+            </select>
+        </label>
+        <label>
+            Giorno
+            <select name="month">
+                <?php foreach (1, 31) as $day : ?>
+                <option <?php echo $day == intval(date('d')) ? 'checked="checked"' : ''; ?>
+                        value="<?php echo $day; ?>"><?php echo $day; ?></option>
+                <?php endforeach; ?>
+            </select>
+        </label>
+        <label>
+            Ora
+            <select name="month">
+                <?php foreach (1, 24) as $hour : ?>
+                <option <?php echo $hour == intval(date('H')) ? 'checked="checked"' : ''; ?>
+                        value="<?php echo $hour; ?>"><?php echo $hour; ?></option>
+                <?php endforeach; ?>
+            </select>
+        </label>
+        <label>
+            Minuto
+            <select name="month">
+                <?php foreach (1, 60) as $minute : ?>
+                <option <?php echo $minute == intval(date('i')) ? 'checked="checked"' : ''; ?>
+                        value="<?php echo $minute; ?>"><?php echo $minute; ?></option>
+                <?php endforeach; ?>
+            </select>
+        </label>
+
+        <label>
             Import
             <input type="file" name="file">
         </label>
