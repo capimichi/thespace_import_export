@@ -62,7 +62,7 @@
     <p></p>
 
     <table id="import_table_product_cron"
-           data-template-row="<tr><td>{file}</td><td>{time}</td><td><button class='remove-button' data-file='{file}'>X</button></td></tr>">
+           data-template-row="<tr><td>{file}</td><td>{date}</td><td><button class='remove-button' data-file='{file}'>X</button></td></tr>">
         <thead>
         <tr>
             <th>File</th>
@@ -115,11 +115,14 @@
         $j("body").on("click", ".remove-button", function () {
             var t = $j(this);
 
+            loading('Rimozione in corso');
+
             removeCronItem({
                 file: t.data('file')
             })
                 .done(function (response) {
                     updateCronList();
+                    endLoading();
                 });
 
         });
@@ -142,69 +145,18 @@
         function updateCronList() {
             getCronItems()
                 .done(function (response) {
+                    console.log(response);
                     var files = response.files;
                     var html = "";
                     $j.each(files, function (key, fileItem) {
                         var row = cronItemsTable.data('template-row');
                         row = row.replace(/{file}/g, fileItem.name);
-                        row = row.replace(/{time}/g, JSON.stringify(fileItem.time));
+                        row = row.replace(/{date}/g, JSON.stringify(fileItem.date));
                         html += row;
                     });
                     cronItemsTable.find('tbody').html(html);
                 });
         }
-
-        // var importProductsForm = $j("#import_form_product_import");
-        //
-        // importProductsForm.on("submit", function (e) {
-        //
-        //     var formData = new FormData(this);
-        //     loading('');
-        //
-        //     splitImport(formData, {
-        //         onComplete: function (response) {
-        //             if (response.status === 'OK') {
-        //                 var groupFiles = response.files;
-        //
-        //                 importGroups(groupFiles, 0, {
-        //                     onProcess: function (response, index) {
-        //
-        //                         $j.each(response.errors, function (k, error) {
-        //
-        //                             var errorMessage = '<a href="{url}" target="_blank">{index}</a> {error}';
-        //                             var url = globals.urlImportShowimportjson;
-        //                             url = url.replace(/{file}/g, response.file);
-        //
-        //                             errorMessage = errorMessage.replace(/{url}/g, url);
-        //                             errorMessage = errorMessage.replace(/{index}/g, index + 1);
-        //                             errorMessage = errorMessage.replace(/{error}/g, JSON.stringify(error));
-        //
-        //
-        //                             printError(errorMessage);
-        //                         });
-        //
-        //                         var progress = 'Import in corso: {step} / {total}';
-        //                         progress = progress.replace(/{step}/g, index + 1);
-        //                         progress = progress.replace(/{total}/g, groupFiles.length);
-        //                         // $j("#progress_status").html(progress);
-        //                         loading(progress);
-        //                     },
-        //                     onComplete: function () {
-        //                         console.log('Complete');
-        //                         setTimeout(function () {
-        //                             endLoading();
-        //                         }, 500);
-        //                     }
-        //                 });
-        //             }
-        //         },
-        //         onError: function (response) {
-        //             alert(JSON.stringify(response));
-        //         }
-        //     });
-        //
-        //     e.preventDefault();
-        // });
 
         function loading(text) {
             $j("body").waitMe({
@@ -244,166 +196,5 @@
             });
         }
 
-        // function parseImport(data, options) {
-        //
-        //     options = {
-        //         ...{
-        //             onComplete: function (response) {
-        //
-        //             },
-        //             onError: function (response) {
-        //
-        //             }
-        //         }, ...options
-        //     };
-        //
-        //
-        //     $j.ajax({
-        //         url: globals.urlImportParse,
-        //         method: 'post',
-        //         data: data,
-        //         processData: false,
-        //         cache: false,
-        //         contentType: false,
-        //         success: function (response) {
-        //             options.onComplete(response);
-        //         },
-        //         error: function (response) {
-        //             options.onError(response);
-        //         }
-        //
-        //     });
-        // }
-
-        // /**
-        //  * Split files
-        //  * @param data
-        //  * @param options
-        //  */
-        // function splitImport(data, options) {
-        //
-        //     options = {
-        //         ...{
-        //             onComplete: function (response) {
-        //
-        //             },
-        //             onError: function (response) {
-        //
-        //             }
-        //         }, ...options
-        //     };
-        //
-        //     $j.ajax({
-        //         url: globals.urlImportSplit,
-        //         method: 'post',
-        //         data: data,
-        //         processData: false,
-        //         cache: false,
-        //         contentType: false,
-        //         success: function (response) {
-        //             options.onComplete(response);
-        //         },
-        //         error: function (response) {
-        //             options.onError(response);
-        //         }
-        //     });
-        // }
-
-        // /**
-        //  * Split files
-        //  * @param data
-        //  * @param options
-        //  */
-        // function checkImport(data, options) {
-        //
-        //     options = {
-        //         ...{
-        //             onComplete: function (response) {
-        //
-        //             },
-        //             onError: function (response) {
-        //
-        //             }
-        //         }, ...options
-        //     };
-        //
-        //     console.log(data);
-        //
-        //     $j.ajax({
-        //         url: globals.urlImportCheck,
-        //         method: 'post',
-        //         data: data,
-        //         success: function (response) {
-        //             options.onComplete(response);
-        //         },
-        //         error: function (response) {
-        //             options.onError(response);
-        //         }
-        //     });
-        // }
-
-        // function printError(errorText) {
-        //     var errorsTable = $j("#import_table_product_errors");
-        //     errorsTable.fadeIn(0);
-        //
-        //     var row = errorsTable.data('template-row');
-        //     row = row.replace(/{row}/g, errorText);
-        //     errorsTable.find("tbody").prepend(row);
-        // }
-
-        //$j("#import_form_product_import").on("submit", function (e) {
-        //
-        //    var formData = new FormData(this);
-        //
-        //    $j.ajax({
-        //        url: '<?php //echo Mage::helper("adminhtml")->getUrl("thespaceimportexport/import/ajaximportcheck"); ?>//',
-        //        method: 'post',
-        //        data: formData,
-        //        processData: false,
-        //        cache: false,
-        //        contentType: false,
-        //        success: function (response) {
-        //
-        //            var errorTable = $j("#import_table_product_errors");
-        //            errorTable.find("tbody").html('');
-        //            errorTable.fadeIn(0);
-        //
-        //            if (response.errors.length) {
-        //                var rowTemplate = errorTable.data('template-row');
-        //                var rowsData = "";
-        //
-        //                for (var i = 0; i < response.errors.length; i++) {
-        //                    var error = response.errors[i];
-        //                    var rowItem = rowTemplate;
-        //                    rowItem = rowItem.replace(/{row}/g, error.row);
-        //                    rowItem = rowItem.replace(/{columns}/g, error.columns);
-        //                    rowsData += rowItem;
-        //                }
-        //                errorTable.find("tbody").html(rowsData);
-        //            } else {
-        //
-        //                $j.ajax({
-        //                    url: '<?php //echo Mage::helper("adminhtml")->getUrl("thespaceimportexport/import/ajaximportrun"); ?>//',
-        //                    method: 'post',
-        //                    data: formData,
-        //                    processData: false,
-        //                    cache: false,
-        //                    contentType: false,
-        //                    success: function (response) {
-        //                        console.log(response);
-        //                    },
-        //                    error: function (response) {
-        //
-        //                    }
-        //                });
-        //            }
-        //        },
-        //        error: function (response) {
-        //
-        //        }
-        //    });
-        //
-        //    e.preventDefault();
-        //});
     });
 </script>
