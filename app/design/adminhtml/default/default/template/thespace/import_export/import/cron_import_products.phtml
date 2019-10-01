@@ -67,6 +67,20 @@
     $j(function () {
 
         var globals = $j("#import_products").data();
+        var cronItemsTable = $j("#import_table_product_cron");
+
+        getCronItems()
+            .done(function (response) {
+                var files = response.files;
+                var html = "";
+                $j.each(files, function (key, fileItem) {
+                    var row = cronItemsTable.data('template-row');
+                    row = row.replace(/{file}/g, fileItem.name);
+                    row = row.replace(/{time}/g, JSON.stringify(fileItem.time));
+                    html += row;
+                });
+                cronItemsTable.find('tbody').html(html);
+            });
 
         $j("#import_form_product_upload").on("submit", function (e) {
 
@@ -197,8 +211,8 @@
 
         function getCronItems() {
             return $j.ajax({
-                url: '',
-                method:
+                url: globals.urlCronList,
+                method: 'get'
             });
         }
 

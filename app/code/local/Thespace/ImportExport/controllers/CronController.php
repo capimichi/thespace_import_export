@@ -77,6 +77,7 @@ class Thespace_ImportExport_CronController extends Mage_Adminhtml_Controller_Act
     
     public function ajaximportlistAction()
     {
+        $cronHelper = Mage::helper('thespaceimportexport/Cron');
         header('Content-Type: application/json');
         $response = [
             'status' => 'OK',
@@ -96,7 +97,13 @@ class Thespace_ImportExport_CronController extends Mage_Adminhtml_Controller_Act
             $todoFiles = array_diff(scandir($importDirectory), ['..', '.']);
             
             foreach ($todoFiles as $todoFile) {
-                $files[] = $importDirectory . $todoFile;
+                $p = $importDirectory . $todoFile;
+                $fileItem = [
+                    'name' => basename($todoFile),
+                    'file' => $p,
+                    'date' => $cronHelper->getFileExecution($p),
+                ];
+                $files[] = $fileItem;
             }
         }
         
