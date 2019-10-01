@@ -41,7 +41,7 @@
         <label>
             Ora
             <select name="month">
-                <?php foreach (range(1, 24) as $hour) : ?>
+                <?php foreach (range(0, 23) as $hour) : ?>
                     <option <?php echo $hour == intval(date('H')) ? 'selected="selected"' : ''; ?>
                             value="<?php echo $hour; ?>"><?php echo $hour; ?></option>
                 <?php endforeach; ?>
@@ -50,7 +50,7 @@
         <label>
             Minuto
             <select name="month">
-                <?php foreach (range(1, 60) as $minute) : ?>
+                <?php foreach (range(0, 59) as $minute) : ?>
                     <option <?php echo $minute == intval(date('i')) ? 'selected="selected"' : ''; ?>
                             value="<?php echo $minute; ?>"><?php echo $minute; ?></option>
                 <?php endforeach; ?>
