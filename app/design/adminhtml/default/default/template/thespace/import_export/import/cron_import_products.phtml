@@ -28,7 +28,7 @@
             </select>
         </label>
         <label>
-            <select name="month">
+            <select name="day">
                 <?php foreach (range(1, 31) as $day) : ?>
                     <option <?php echo $day == intval(date('d')) ? 'selected="selected"' : ''; ?>
                             value="<?php echo $day; ?>"><?php echo $day; ?></option>
@@ -36,7 +36,7 @@
             </select>
         </label>
         <label>
-            <select name="month">
+            <select name="hour">
                 <?php foreach (range(0, 23) as $hour) : ?>
                     <option <?php echo $hour == intval(date('H')) ? 'selected="selected"' : ''; ?>
                             value="<?php echo $hour; ?>"><?php echo $hour; ?></option>
@@ -44,7 +44,7 @@
             </select>
         </label>
         <label>
-            <select name="month">
+            <select name="minute">
                 <?php foreach (range(0, 59) as $minute) : ?>
                     <option <?php echo $minute == intval(date('i')) ? 'selected="selected"' : ''; ?>
                             value="<?php echo $minute; ?>"><?php echo $minute; ?></option>
@@ -116,7 +116,7 @@
             var t = $j(this);
 
             removeCronItem({
-                name: t.data('name')
+                file: t.data('file')
             })
                 .done(function (response) {
                     updateCronList();
@@ -221,7 +221,7 @@
         function addCronItem(data) {
             return $j.ajax({
                 url: globals.urlCronAdd,
-                method: 'get',
+                method: 'post',
                 data: data,
                 processData: false,
                 cache: false,

@@ -24,11 +24,11 @@ class Thespace_ImportExport_CronController extends Mage_Adminhtml_Controller_Act
             'errors' => [],
         ];
         
-        $year = $_GET['day'];
-        $month = $_GET['day'];
-        $day = $_GET['day'];
-        $hour = $_GET['hour'];
-        $minute = $_GET['minute'];
+        $year = $_POST['year'];
+        $month = $_POST['month'];
+        $day = $_POST['day'];
+        $hour = $_POST['hour'];
+        $minute = $_POST['minute'];
         
         if (isset($_FILES['file'])) {
             $filePath = $_FILES['file']['tmp_name'];
