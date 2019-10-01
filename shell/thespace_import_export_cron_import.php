@@ -28,6 +28,10 @@ class Thespace_Import_Export_Cron_Import extends Mage_Shell_Abstract
     // Shell script point of entry
     public function run()
     {
+        $cronHelper = Mage::helper('thespaceimportexport/Cron');
+        
+        $stepRows = 1000;
+        
         $todoDirectory = implode(DIRECTORY_SEPARATOR, [
                 \Mage::getBaseDir('media'),
                 "thespace-import-export",
@@ -39,15 +43,15 @@ class Thespace_Import_Export_Cron_Import extends Mage_Shell_Abstract
             mkdir($todoDirectory, 0777, true);
         }
         
-        $doneDirectory = implode(DIRECTORY_SEPARATOR, [
+        $importDirectory = implode(DIRECTORY_SEPARATOR, [
                 \Mage::getBaseDir('media'),
                 "thespace-import-export",
                 "cron",
                 "done",
                 "",
             ]) . DIRECTORY_SEPARATOR;
-        if (!file_exists($doneDirectory)) {
-            mkdir($doneDirectory, 0777, true);
+        if (!file_exists($importDirectory)) {
+            mkdir($importDirectory, 0777, true);
         }
         
         if (file_exists($todoDirectory)) {
@@ -58,7 +62,61 @@ class Thespace_Import_Export_Cron_Import extends Mage_Shell_Abstract
                 $todoFilePath = $todoDirectory . $todoFile;
                 
                 if (file_exists($todoFilePath)) {
-                
+                    
+                    $isExecutable = $cronHelper->isExecutable();
+                    
+                    if ($isExecutable) {
+                        
+                        $importFile = $importDirectory . basename($todoFile);
+                        copy($todoFilePath, $importFile);
+                        unlink($todoFilePath);
+                        
+                        $configurationHelper = Mage::helper('thespaceimportexport/Configuration');
+                        $skuHelper = Mage::helper('thespaceimportexport/Sku');
+                        $importHelper = Mage::helper('thespaceimportexport/Import');
+                        $csvHelper = Mage::helper('thespaceimportexport/Csv');
+                        $productParserHelper = Mage::helper('thespaceimportexport/ProductParser');
+                        
+                        $existingSkus = $skuHelper->getExistingSkus();
+                        $attributes = Mage::getResourceModel('catalog/product_attribute_collection')
+                            ->getItems();
+                        
+                        $defaultRow = [
+                            '_attribute_set'    => $configurationHelper->get(Thespace_ImportExport_Helper_Configuration::OPTION_DEFAULT_ATTRIBUTE_SET),
+                            '_product_websites' => $configurationHelper->get(Thespace_ImportExport_Helper_Configuration::OPTION_DEFAULT_PRODUCT_WEBSITES),
+                            'tax_class_id'      => $configurationHelper->get(Thespace_ImportExport_Helper_Configuration::OPTION_DEFAULT_TAX_CLASS_ID),
+                        ];
+                        
+                        $rows = [];
+                        foreach ($csvHelper->getRows($importFile) as $row) {
+                            $rowData = $productParserHelper->getDataFromRow($row, $attributes);
+                            
+                            if (!in_array($rowData['sku'], $existingSkus)) {
+                                $row = array_merge($defaultRow, $row);
+                            }
+                            
+                            $rows[] = $row;
+                        }
+                        
+                        $dataItems = $productParserHelper->getDataFromRows($rows);
+                        $dataItems = $productParserHelper->applyParentCells($dataItems);
+                        
+                        $dataGroups = $importHelper->groupImportItems($dataItems, $stepRows);
+                        
+                        $productParserHelper = Mage::helper('thespaceimportexport/ProductParser');
+                        
+                        $import = Mage::getModel('fastsimpleimport/import');
+                        
+                        foreach ($dataGroups as $dataGroup) {
+                            try {
+                                $dataGroup = $productParserHelper->parseImages($dataGroup);
+                                $dataGroup = $productParserHelper->parseArrayCells($dataGroup);
+                                
+                                $import->processProductImport($dataGroup);
+                            } catch (Exception $e) {
+                            }
+                        }
+                    }
                 }
             }
         }

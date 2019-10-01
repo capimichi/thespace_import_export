@@ -3,11 +3,9 @@
 <script src="https://cdn.jsdelivr.net/gh/vadimsva/waitMe/waitMe.min.js"></script>
 
 <div id="import_products"
-     data-url-import-split="<?php echo Mage::helper("adminhtml")->getUrl("thespaceimportexport/import/ajaximportsplit"); ?>?isAjax=true&form_key=<?php echo Mage::getSingleton('core/session')->getFormKey() ?>"
-     data-url-import-parse="<?php echo Mage::helper("adminhtml")->getUrl("thespaceimportexport/import/ajaximportparse"); ?>?isAjax=true&form_key=<?php echo Mage::getSingleton('core/session')->getFormKey() ?>"
-     data-url-import-check="<?php echo Mage::helper("adminhtml")->getUrl("thespaceimportexport/import/ajaximportcheck"); ?>?isAjax=true&form_key=<?php echo Mage::getSingleton('core/session')->getFormKey() ?>"
-     data-url-import-run="<?php echo Mage::helper("adminhtml")->getUrl("thespaceimportexport/import/ajaximportrun"); ?>?isAjax=true&form_key=<?php echo Mage::getSingleton('core/session')->getFormKey() ?>"
-     data-url-import-showimportjson="<?php echo Mage::helper("adminhtml")->getUrl("thespaceimportexport/import/showimportjson"); ?>?form_key=<?php echo Mage::getSingleton('core/session')->getFormKey() ?>&file={file}"
+     data-url-cron-list="<?php echo Mage::helper("adminhtml")->getUrl("thespaceimportexport/cron/ajaximportlist"); ?>?isAjax=true&form_key=<?php echo Mage::getSingleton('core/session')->getFormKey() ?>"
+     data-url-cron-add="<?php echo Mage::helper("adminhtml")->getUrl("thespaceimportexport/cron/ajaximportadd"); ?>?isAjax=true&form_key=<?php echo Mage::getSingleton('core/session')->getFormKey() ?>"
+     data-url-cron-remove="<?php echo Mage::helper("adminhtml")->getUrl("thespaceimportexport/cron/ajaximportremove"); ?>?isAjax=true&form_key=<?php echo Mage::getSingleton('core/session')->getFormKey() ?>"
      data-form-key="<?php echo Mage::getSingleton('core/session')->getFormKey() ?>"
 >
     <h2>Caricamento prodotti a cron</h2>
@@ -20,15 +18,47 @@
         </label>
 
         <input type="submit" value="Carica file">
-
-        <div class="import_form_product_upload_info" style="display:none;">
-            <p>
-                Numero di righe: <span id="import_form_product_import_rows_count">Seleziona file...</span>
-            </p>
-        </div>
     </form>
     <p></p>
+
+    <table id="import_table_product_cron"
+           data-template-row="<tr><td>{file}</td><td>{time}</td></tr>">
+        <thead>
+        <tr>
+            <th>File</th>
+            <th>Esecuzione</th>
+        </tr>
+        </thead>
+        <tbody>
+        </tbody>
+    </table>
 </div>
+
+<style>
+
+    table {
+        border-collapse: collapse;
+    }
+
+    table, th, td {
+        border: 1px solid black;
+    }
+
+    #import_table_product_cron {
+        width: 100%;
+        max-height: 400px;
+        border: none;
+        display: block;
+        overflow: scroll;
+        border-collapse: collapse;
+    }
+
+    #import_table_product_cron th,
+    #import_table_product_cron td {
+        border: 1px solid grey;
+        padding: 5px;
+    }
+</style>
 
 <script>
 
@@ -39,48 +69,58 @@
         var globals = $j("#import_products").data();
 
         $j("#import_form_product_upload").on("submit", function (e) {
+            var formData = new FormData(this);
+
+        });
+
+        $j("#import_form_product_upload").on("submit", function (e) {
 
             var formData = new FormData(this);
 
             loading('Caricamento file');
 
-            parseImport(formData, {
-                onComplete: function (response) {
+            addCronItem(formData)
+                .done(function (response) {
+                    alert('Si');
+                });
 
-                    endLoading();
-
-                    // loading('Verifica del file');
-                    $j("#import_form_product_import_file").val(response.file);
-                    $j("#import_form_product_import_rows_count").html(response.rows_count);
-                    $j("#import_form_product_upload_info").fadeIn(0);
-
-                    // checkImport({
-                    //     file: response.file
-                    // }, {
-                    //     onComplete: function (response) {
-                    //         endLoading();
-
-                    if (response.status === 'OK') {
-
-                        $j("#import_form_product_import").fadeIn(0);
-                    } else {
-
-                        // Mostro errori file
-
-                        $j.each(response.errors, function (index, error) {
-                            printError(error);
-                        });
-                    }
-                    // },
-                    // onError: function (response) {
-                    //     alert(JSON.stringify(response));
-                    // }
-                    // });
-                },
-                onError: function (response) {
-                    alert(JSON.stringify(response));
-                }
-            });
+            // parseImport(formData, {
+            //     onComplete: function (response) {
+            //
+            //         endLoading();
+            //
+            //         // loading('Verifica del file');
+            //         $j("#import_form_product_import_file").val(response.file);
+            //         $j("#import_form_product_import_rows_count").html(response.rows_count);
+            //         $j("#import_form_product_upload_info").fadeIn(0);
+            //
+            //         // checkImport({
+            //         //     file: response.file
+            //         // }, {
+            //         //     onComplete: function (response) {
+            //         //         endLoading();
+            //
+            //         if (response.status === 'OK') {
+            //
+            //             $j("#import_form_product_import").fadeIn(0);
+            //         } else {
+            //
+            //             // Mostro errori file
+            //
+            //             $j.each(response.errors, function (index, error) {
+            //                 printError(error);
+            //             });
+            //         }
+            //         // },
+            //         // onError: function (response) {
+            //         //     alert(JSON.stringify(response));
+            //         // }
+            //         // });
+            //     },
+            //     onError: function (response) {
+            //         alert(JSON.stringify(response));
+            //     }
+            // });
 
             e.preventDefault();
         });
@@ -149,141 +189,130 @@
             $j("body").waitMe('hide');
         }
 
-        function importGroups(groups, index, options) {
-
-            if (index < groups.length) {
-
-                var group = groups[index];
-
-                $j.ajax({
-                    url: globals.urlImportRun,
-                    method: 'post',
-                    data: {
-                        file: group,
-                        group: index,
-                    },
-                    // processData: false,
-                    // cache: false,
-                    // contentType: false,
-                    success: function (response) {
-                        console.log(response);
-                        options.onProcess(response, index);
-                        importGroups(groups, index + 1, options);
-                    }
-                });
-            } else {
-
-                options.onComplete();
-            }
-
-        }
-
-        function parseImport(data, options) {
-
-            options = {
-                ...{
-                    onComplete: function (response) {
-
-                    },
-                    onError: function (response) {
-
-                    }
-                }, ...options
-            };
-
-
-            $j.ajax({
-                url: globals.urlImportParse,
+        function addCronItem(data) {
+            return $j.ajax({
+                url: globals.urlCronAdd,
                 method: 'post',
                 data: data,
                 processData: false,
                 cache: false,
                 contentType: false,
-                success: function (response) {
-                    options.onComplete(response);
-                },
-                error: function (response) {
-                    options.onError(response);
-                }
-
             });
         }
 
-        /**
-         * Split files
-         * @param data
-         * @param options
-         */
-        function splitImport(data, options) {
-
-            options = {
-                ...{
-                    onComplete: function (response) {
-
-                    },
-                    onError: function (response) {
-
-                    }
-                }, ...options
-            };
-
-            $j.ajax({
-                url: globals.urlImportSplit,
-                method: 'post',
-                data: data,
-                processData: false,
-                cache: false,
-                contentType: false,
-                success: function (response) {
-                    options.onComplete(response);
-                },
-                error: function (response) {
-                    options.onError(response);
-                }
-            });
+        function getCronItems() {
+            return $j.ajax({
+                url: '',
+                method:
+            })
         }
 
-        /**
-         * Split files
-         * @param data
-         * @param options
-         */
-        function checkImport(data, options) {
+        // function parseImport(data, options) {
+        //
+        //     options = {
+        //         ...{
+        //             onComplete: function (response) {
+        //
+        //             },
+        //             onError: function (response) {
+        //
+        //             }
+        //         }, ...options
+        //     };
+        //
+        //
+        //     $j.ajax({
+        //         url: globals.urlImportParse,
+        //         method: 'post',
+        //         data: data,
+        //         processData: false,
+        //         cache: false,
+        //         contentType: false,
+        //         success: function (response) {
+        //             options.onComplete(response);
+        //         },
+        //         error: function (response) {
+        //             options.onError(response);
+        //         }
+        //
+        //     });
+        // }
 
-            options = {
-                ...{
-                    onComplete: function (response) {
+        // /**
+        //  * Split files
+        //  * @param data
+        //  * @param options
+        //  */
+        // function splitImport(data, options) {
+        //
+        //     options = {
+        //         ...{
+        //             onComplete: function (response) {
+        //
+        //             },
+        //             onError: function (response) {
+        //
+        //             }
+        //         }, ...options
+        //     };
+        //
+        //     $j.ajax({
+        //         url: globals.urlImportSplit,
+        //         method: 'post',
+        //         data: data,
+        //         processData: false,
+        //         cache: false,
+        //         contentType: false,
+        //         success: function (response) {
+        //             options.onComplete(response);
+        //         },
+        //         error: function (response) {
+        //             options.onError(response);
+        //         }
+        //     });
+        // }
 
-                    },
-                    onError: function (response) {
+        // /**
+        //  * Split files
+        //  * @param data
+        //  * @param options
+        //  */
+        // function checkImport(data, options) {
+        //
+        //     options = {
+        //         ...{
+        //             onComplete: function (response) {
+        //
+        //             },
+        //             onError: function (response) {
+        //
+        //             }
+        //         }, ...options
+        //     };
+        //
+        //     console.log(data);
+        //
+        //     $j.ajax({
+        //         url: globals.urlImportCheck,
+        //         method: 'post',
+        //         data: data,
+        //         success: function (response) {
+        //             options.onComplete(response);
+        //         },
+        //         error: function (response) {
+        //             options.onError(response);
+        //         }
+        //     });
+        // }
 
-                    }
-                }, ...options
-            };
-
-            console.log(data);
-
-            $j.ajax({
-                url: globals.urlImportCheck,
-                method: 'post',
-                data: data,
-                success: function (response) {
-                    options.onComplete(response);
-                },
-                error: function (response) {
-                    options.onError(response);
-                }
-            });
-        }
-
-        function printError(errorText) {
-            var errorsTable = $j("#import_table_product_errors");
-            errorsTable.fadeIn(0);
-
-            var row = errorsTable.data('template-row');
-            row = row.replace(/{row}/g, errorText);
-            errorsTable.find("tbody").prepend(row);
-        }
+        // function printError(errorText) {
+        //     var errorsTable = $j("#import_table_product_errors");
+        //     errorsTable.fadeIn(0);
+        //
+        //     var row = errorsTable.data('template-row');
+        //     row = row.replace(/{row}/g, errorText);
+        //     errorsTable.find("tbody").prepend(row);
+        // }
 
         //$j("#import_form_product_import").on("submit", function (e) {
         //
