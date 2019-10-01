@@ -145,13 +145,18 @@
         function updateCronList() {
             getCronItems()
                 .done(function (response) {
-                    console.log(response);
                     var files = response.files;
                     var html = "";
                     $j.each(files, function (key, fileItem) {
                         var row = cronItemsTable.data('template-row');
                         row = row.replace(/{file}/g, fileItem.name);
-                        row = row.replace(/{date}/g, JSON.stringify(fileItem.date));
+                        var dateString = "{year}/{month}/{day} {hour}:{minute}";
+                        dateString = dateString.replace(/{year}/g, fileItem.date.year);
+                        dateString = dateString.replace(/{month}/g, fileItem.date.month);
+                        dateString = dateString.replace(/{day}/g, fileItem.date.day);
+                        dateString = dateString.replace(/{hour}/g, fileItem.date.hour);
+                        dateString = dateString.replace(/{minute}/g, fileItem.date.minute);
+                        row = row.replace(/{date}/g, dateString);
                         html += row;
                     });
                     cronItemsTable.find('tbody').html(html);
