@@ -63,7 +63,7 @@ class Thespace_Import_Export_Cron_Import extends Mage_Shell_Abstract
                 
                 if (file_exists($todoFilePath)) {
                     
-                    $isExecutable = $cronHelper->isExecutable();
+                    $isExecutable = $cronHelper->isExecutable($todoFilePath);
                     
                     if ($isExecutable) {
                         
