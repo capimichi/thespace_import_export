@@ -17,7 +17,7 @@ class Thespace_ImportExport_Helper_Cron extends Mage_Core_Helper_Abstract
         
         return [
             'Y' => $parts[0],
-            'M' => $parts[1],
+            'm' => $parts[1],
             'd' => $parts[2],
             'H' => $parts[3],
             'i' => $parts[4],
@@ -38,7 +38,12 @@ class Thespace_ImportExport_Helper_Cron extends Mage_Core_Helper_Abstract
         
         $executable = true;
         foreach ($fileExecutionDate as $key => $value) {
-            if (intval($now->format($key)) != intval($value)) {
+            $t1 = intval($now->format($key));
+            $t2 = intval($value);
+            var_dump([
+                $t1, $t2,
+            ]);
+            if ($t1 != $t2) {
                 $executable = false;
             }
         }
