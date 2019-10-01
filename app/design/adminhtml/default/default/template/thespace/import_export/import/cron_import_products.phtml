@@ -69,11 +69,6 @@
         var globals = $j("#import_products").data();
 
         $j("#import_form_product_upload").on("submit", function (e) {
-            var formData = new FormData(this);
-
-        });
-
-        $j("#import_form_product_upload").on("submit", function (e) {
 
             var formData = new FormData(this);
 
@@ -125,57 +120,57 @@
             e.preventDefault();
         });
 
-        var importProductsForm = $j("#import_form_product_import");
-
-        importProductsForm.on("submit", function (e) {
-
-            var formData = new FormData(this);
-            loading('');
-
-            splitImport(formData, {
-                onComplete: function (response) {
-                    if (response.status === 'OK') {
-                        var groupFiles = response.files;
-
-                        importGroups(groupFiles, 0, {
-                            onProcess: function (response, index) {
-
-                                $j.each(response.errors, function (k, error) {
-
-                                    var errorMessage = '<a href="{url}" target="_blank">{index}</a> {error}';
-                                    var url = globals.urlImportShowimportjson;
-                                    url = url.replace(/{file}/g, response.file);
-
-                                    errorMessage = errorMessage.replace(/{url}/g, url);
-                                    errorMessage = errorMessage.replace(/{index}/g, index + 1);
-                                    errorMessage = errorMessage.replace(/{error}/g, JSON.stringify(error));
-
-
-                                    printError(errorMessage);
-                                });
-
-                                var progress = 'Import in corso: {step} / {total}';
-                                progress = progress.replace(/{step}/g, index + 1);
-                                progress = progress.replace(/{total}/g, groupFiles.length);
-                                // $j("#progress_status").html(progress);
-                                loading(progress);
-                            },
-                            onComplete: function () {
-                                console.log('Complete');
-                                setTimeout(function () {
-                                    endLoading();
-                                }, 500);
-                            }
-                        });
-                    }
-                },
-                onError: function (response) {
-                    alert(JSON.stringify(response));
-                }
-            });
-
-            e.preventDefault();
-        });
+        // var importProductsForm = $j("#import_form_product_import");
+        //
+        // importProductsForm.on("submit", function (e) {
+        //
+        //     var formData = new FormData(this);
+        //     loading('');
+        //
+        //     splitImport(formData, {
+        //         onComplete: function (response) {
+        //             if (response.status === 'OK') {
+        //                 var groupFiles = response.files;
+        //
+        //                 importGroups(groupFiles, 0, {
+        //                     onProcess: function (response, index) {
+        //
+        //                         $j.each(response.errors, function (k, error) {
+        //
+        //                             var errorMessage = '<a href="{url}" target="_blank">{index}</a> {error}';
+        //                             var url = globals.urlImportShowimportjson;
+        //                             url = url.replace(/{file}/g, response.file);
+        //
+        //                             errorMessage = errorMessage.replace(/{url}/g, url);
+        //                             errorMessage = errorMessage.replace(/{index}/g, index + 1);
+        //                             errorMessage = errorMessage.replace(/{error}/g, JSON.stringify(error));
+        //
+        //
+        //                             printError(errorMessage);
+        //                         });
+        //
+        //                         var progress = 'Import in corso: {step} / {total}';
+        //                         progress = progress.replace(/{step}/g, index + 1);
+        //                         progress = progress.replace(/{total}/g, groupFiles.length);
+        //                         // $j("#progress_status").html(progress);
+        //                         loading(progress);
+        //                     },
+        //                     onComplete: function () {
+        //                         console.log('Complete');
+        //                         setTimeout(function () {
+        //                             endLoading();
+        //                         }, 500);
+        //                     }
+        //                 });
+        //             }
+        //         },
+        //         onError: function (response) {
+        //             alert(JSON.stringify(response));
+        //         }
+        //     });
+        //
+        //     e.preventDefault();
+        // });
 
         function loading(text) {
             $j("body").waitMe({
