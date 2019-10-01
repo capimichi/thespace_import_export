@@ -40,9 +40,6 @@ class Thespace_ImportExport_Helper_Cron extends Mage_Core_Helper_Abstract
         foreach ($fileExecutionDate as $key => $value) {
             $t1 = intval($now->format($key));
             $t2 = intval($value);
-            var_dump([
-                $t1, $t2,
-            ]);
             if ($t1 != $t2) {
                 $executable = false;
             }
