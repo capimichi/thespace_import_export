@@ -175,7 +175,7 @@ class Thespace_ImportExport_ImportController extends Mage_Adminhtml_Controller_A
                 $now->format('Y'),
                 $now->format('m'),
                 $now->format('d'),
-                $now->format('Y-m-d-h-i-s'),
+                $now->format('Y-m-d-H-i-s'),
             ]) . DIRECTORY_SEPARATOR;
         
         $canCreateImportDirectory = true;
