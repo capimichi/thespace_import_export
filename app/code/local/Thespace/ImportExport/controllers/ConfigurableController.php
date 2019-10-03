@@ -23,7 +23,7 @@ class Thespace_ImportExport_ConfigurableController extends Mage_Adminhtml_Contro
             'status' => 'OK',
             'errors' => [],
         ];
-    
+        
         $importHelper = Mage::helper('thespaceimportexport/Import');
         $csvHelper = Mage::helper('thespaceimportexport/Csv');
         $productParserHelper = Mage::helper('thespaceimportexport/ProductParser');
@@ -36,15 +36,42 @@ class Thespace_ImportExport_ConfigurableController extends Mage_Adminhtml_Contro
             
             $dataItems = $productParserHelper->getConfigurableItemsFromRow($row);
         }
-    
+        
         $dataItems = $productParserHelper->applyParentCells($dataItems);
-    
+        
+        $now = new DateTime();
+        
+        $importDir = implode(DIRECTORY_SEPARATOR, [
+                \Mage::getBaseDir('media'),
+                "thespace-import-export",
+                "bulk-configurable",
+                $now->format('Y'),
+                $now->format('m'),
+                $now->format('d'),
+            ]) . DIRECTORY_SEPARATOR;
+        if (!file_exists($importDir)) {
+            mkdir($importDir, 0777, true);
+        }
+        $importFile = implode(DIRECTORY_SEPARATOR, [
+            $importDir,
+            $now->format('Y-m-d-h-i-s') . ".json",
+        ]);
+        
+        file_put_contents($importFile, json_encode($dataItems));
+        
         $dataGroups = $importHelper->groupImportItems($dataItems, 500);
         
         $import = Mage::getModel('fastsimpleimport/import');
         
         $index = 0;
         foreach ($dataGroups as $dataGroup) {
+            
+            $univokeDataGroup = [];
+            foreach ($dataGroup as $dataGroupItem) {
+                $sku = $dataGroupItem['sku'];
+                $univokeDataGroup[$sku] = $dataGroupItem;
+            }
+            $dataGroup = array_values($univokeDataGroup);
             
             $dataGroup = $productParserHelper->parseArrayCells($dataGroup);
             

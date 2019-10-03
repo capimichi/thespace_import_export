@@ -660,9 +660,12 @@ class Thespace_ImportExport_Helper_ProductParser extends Mage_Core_Helper_Abstra
             $attributes = Mage::getResourceModel('catalog/product_attribute_collection')
                 ->getItems();
         }
-        
+    
+        $configurationHelper = Mage::helper('thespaceimportexport/Configuration');
+        $productParserHelper = Mage::helper('thespaceimportexport/ParserHelper');
         $combinationHelper = Mage::helper('thespaceimportexport/Combination');
         $slugHelper = Mage::helper('thespaceimportexport/Slug');
+        $skuHelper = Mage::helper('thespaceimportexport/Sku');
         
         $items = [];
         
@@ -687,6 +690,8 @@ class Thespace_ImportExport_Helper_ProductParser extends Mage_Core_Helper_Abstra
                 $attributeValueGroups[] = array_unique($values);
             }
         }
+
+//        $existingSkus = $skuHelper->getExistingSkus();
         
         $combinations = $combinationHelper->getCombinations($attributeValueGroups);
         
@@ -694,7 +699,19 @@ class Thespace_ImportExport_Helper_ProductParser extends Mage_Core_Helper_Abstra
         
         $parentProduct = Mage::getModel('catalog/product')->loadByAttribute('sku', $sku);
         
-        if ($parentProduct) {
+        $defaultRow = [
+            '_attribute_set'    => $configurationHelper->get(Thespace_ImportExport_Helper_Configuration::OPTION_DEFAULT_ATTRIBUTE_SET),
+            '_product_websites' => $configurationHelper->get(Thespace_ImportExport_Helper_Configuration::OPTION_DEFAULT_PRODUCT_WEBSITES),
+            'tax_class_id'      => $configurationHelper->get(Thespace_ImportExport_Helper_Configuration::OPTION_DEFAULT_TAX_CLASS_ID),
+        ];
+        
+        if (!$parentProduct) {
+            
+            $rowData = $productParserHelper->getDataFromRow($row, $attributes);
+            $rowData = array_merge($defaultRow, $rowData);
+            
+            $parentItem = $rowData;
+        } else {
             
             $parentItem = [
                 'sku'                  => $sku,
