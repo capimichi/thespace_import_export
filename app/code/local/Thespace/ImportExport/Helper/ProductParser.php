@@ -660,9 +660,9 @@ class Thespace_ImportExport_Helper_ProductParser extends Mage_Core_Helper_Abstra
             $attributes = Mage::getResourceModel('catalog/product_attribute_collection')
                 ->getItems();
         }
-    
+        
         $configurationHelper = Mage::helper('thespaceimportexport/Configuration');
-        $productParserHelper = Mage::helper('thespaceimportexport/ParserHelper');
+        $productParserHelper = Mage::helper('thespaceimportexport/ProductParser');
         $combinationHelper = Mage::helper('thespaceimportexport/Combination');
         $slugHelper = Mage::helper('thespaceimportexport/Slug');
         $skuHelper = Mage::helper('thespaceimportexport/Sku');
@@ -711,67 +711,97 @@ class Thespace_ImportExport_Helper_ProductParser extends Mage_Core_Helper_Abstra
             $rowData = array_merge($defaultRow, $rowData);
             
             $parentItem = $rowData;
+            
+            $name = $parentItem['name'];
         } else {
             
             $parentItem = [
-                'sku'                  => $sku,
-                'variation_attributes' => $row['variation_attributes'],
-                '_type'                => 'configurable',
+                'sku' => $sku,
             ];
             
-            $items[] = $parentItem;
-            
             $name = $parentProduct->getName();
+        }
+        
+        $parentItem['variation_attributes'] = $row['variation_attributes'];
+        $parentItem['_type'] = 'configurable';
+        
+        $parentItem = array_merge($defaultRow, $parentItem);
+        
+        $items[] = $parentItem;
+        
+        $index = 0;
+        foreach ($combinations as $combination) {
+            $index++;
             
-            $index = 0;
-            foreach ($combinations as $combination) {
-                $index++;
-                
-                $combinationSku = sprintf("%s-%s", $sku, $slugHelper->getSlug(implode("-", $combination)));
-                
-                $item = array_merge($row, [
-                    'sku'   => $combinationSku,
-                    'name'  => sprintf("%s-%s", $name, implode("-", $combination)),
-                    '_type' => 'simple',
-                ]);
-                
-                foreach ($combination as $key => $value) {
-                    $item[$rowAttributeCodes[$key]] = $value;
-                }
-                
-                if (empty($item['_attribute_set'])) {
+            $combinationSku = sprintf("%s-%s", $sku, $slugHelper->getSlug(implode("-", $combination)));
+            
+            $item = array_merge($row, [
+                'sku'   => $combinationSku,
+                'name'  => sprintf("%s-%s", $name, implode("-", $combination)),
+                '_type' => 'simple',
+            ]);
+            
+            foreach ($combination as $key => $value) {
+                $item[$rowAttributeCodes[$key]] = $value;
+            }
+            
+            if (empty($item['_attribute_set'])) {
+                if ($parentProduct) {
                     $item['_attribute_set'] = Mage::getModel('eav/entity_attribute_set')->load($parentProduct->getAttributeSetId())->getAttributeSetName();
+                } else {
+                    $item['_attribute_set'] = $parentItem['_attribute_set'];
                 }
+            }
+            
+            if (empty($item['_product_websites'])) {
+                $item['_product_websites'] = [];
                 
-                if (empty($item['_product_websites'])) {
-                    $item['_product_websites'] = [];
-                    
+                if ($parentProduct) {
                     foreach ($parentProduct->getWebsiteIds() as $websiteId) {
                         $websiteCode = Mage::getModel('core/website')->load($websiteId)->getData("code");
                         $item['_product_websites'][] = $websiteCode;
                     }
-                    
+                } else {
+                    $item['_product_websites'][] = $parentItem['_product_websites'];
                 }
+            }
+            
+            if (empty($item['tax_class_id'])) {
                 
-                foreach ($attributes as $attribute) {
-                    $attributeCode = $attribute->getData('attribute_code');
-                    if (
-                        !empty($attributeCode)
-                        && intval($attribute->getData('is_required'))
-                        && !in_array($attributeCode, self::NOT_REQUIRED_HEADERS)
-                    ) {
-                        if (!isset($item[$attributeCode])) {
+                if ($parentProduct) {
+                    $item['tax_class_id'] = $parentProduct->getTaxClassId();
+                } else {
+                    $item['tax_class_id'] = $parentItem['tax_class_id'];
+                }
+            }
+            
+            foreach ($attributes as $attribute) {
+                $attributeCode = $attribute->getData('attribute_code');
+                if (
+                    !empty($attributeCode)
+                    && intval($attribute->getData('is_required'))
+                    && !in_array($attributeCode, self::NOT_REQUIRED_HEADERS)
+                ) {
+                    if (!isset($item[$attributeCode])) {
+                        if ($parentProduct) {
                             $item[$attributeCode] = $parentProduct->getData($attributeCode);
+                        } else {
+                            $item[$attributeCode] = $parentItem[$attributeCode];
                         }
                     }
                 }
-                
-                if (empty($item['price'])) {
-                    $item['price'] = $parentProduct->getPrice();
-                }
-                
-                $items[$combinationSku] = $item;
             }
+            
+            if (empty($item['price'])) {
+                if ($parentProduct) {
+                    $item['price'] = $parentProduct->getPrice();
+                } else {
+                    $item['price'] = $parentItem['price'];
+                }
+            }
+            
+            $items[$combinationSku] = $item;
+            
             
             $items = array_values($items);
         }
@@ -786,7 +816,8 @@ class Thespace_ImportExport_Helper_ProductParser extends Mage_Core_Helper_Abstra
      *
      * @return array
      */
-    public function parseArrayCells($dataItems)
+    public
+    function parseArrayCells($dataItems)
     {
         $parsedDataItems = [];
         
@@ -838,7 +869,8 @@ class Thespace_ImportExport_Helper_ProductParser extends Mage_Core_Helper_Abstra
      *
      * @return array
      */
-    public function getMissingHeadersInRow($row, $attributes = null, $existingSkus = null)
+    public
+    function getMissingHeadersInRow($row, $attributes = null, $existingSkus = null)
     {
         if (is_null($attributes)) {
             $attributes = Mage::getResourceModel('catalog/product_attribute_collection')
@@ -903,7 +935,8 @@ class Thespace_ImportExport_Helper_ProductParser extends Mage_Core_Helper_Abstra
      *
      * @return array
      */
-    public function getMissingHeadersInRows($rows, $existingSkus = null)
+    public
+    function getMissingHeadersInRows($rows, $existingSkus = null)
     {
         $missingHeadersRows = [];
         

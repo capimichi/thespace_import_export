@@ -59,6 +59,8 @@ class Thespace_ImportExport_ConfigurableController extends Mage_Adminhtml_Contro
         
         file_put_contents($importFile, json_encode($dataItems));
         
+        Mage::log($importFile);
+        
         $dataGroups = $importHelper->groupImportItems($dataItems, 500);
         
         $import = Mage::getModel('fastsimpleimport/import');
