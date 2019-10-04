@@ -711,6 +711,7 @@ class Thespace_ImportExport_Helper_ProductParser extends Mage_Core_Helper_Abstra
             $rowData = array_merge($defaultRow, $rowData);
             
             $parentItem = $rowData;
+            $parentItem['sku'] = $sku;
             
             $name = $parentItem['name'];
         } else {
@@ -724,6 +725,7 @@ class Thespace_ImportExport_Helper_ProductParser extends Mage_Core_Helper_Abstra
         
         $parentItem['variation_attributes'] = $row['variation_attributes'];
         $parentItem['_type'] = 'configurable';
+        unset($parentItem['parent']);
         
         $parentItem = array_merge($defaultRow, $parentItem);
         
@@ -816,8 +818,7 @@ class Thespace_ImportExport_Helper_ProductParser extends Mage_Core_Helper_Abstra
      *
      * @return array
      */
-    public
-    function parseArrayCells($dataItems)
+    public function parseArrayCells($dataItems)
     {
         $parsedDataItems = [];
         
@@ -869,8 +870,7 @@ class Thespace_ImportExport_Helper_ProductParser extends Mage_Core_Helper_Abstra
      *
      * @return array
      */
-    public
-    function getMissingHeadersInRow($row, $attributes = null, $existingSkus = null)
+    public function getMissingHeadersInRow($row, $attributes = null, $existingSkus = null)
     {
         if (is_null($attributes)) {
             $attributes = Mage::getResourceModel('catalog/product_attribute_collection')
@@ -935,8 +935,7 @@ class Thespace_ImportExport_Helper_ProductParser extends Mage_Core_Helper_Abstra
      *
      * @return array
      */
-    public
-    function getMissingHeadersInRows($rows, $existingSkus = null)
+    public function getMissingHeadersInRows($rows, $existingSkus = null)
     {
         $missingHeadersRows = [];
         

@@ -34,7 +34,7 @@ class Thespace_ImportExport_ConfigurableController extends Mage_Adminhtml_Contro
         
         foreach ($csvHelper->getRows($filePath) as $row) {
             
-            $dataItems = $productParserHelper->getConfigurableItemsFromRow($row);
+            $dataItems = array_merge($dataItems, $productParserHelper->getConfigurableItemsFromRow($row));
         }
         
         $dataItems = $productParserHelper->applyParentCells($dataItems);
