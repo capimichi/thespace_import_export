@@ -39,6 +39,24 @@ class Thespace_ImportExport_ConfigurableController extends Mage_Adminhtml_Contro
         
         $dataItems = $productParserHelper->applyParentCells($dataItems);
         
+        $mergedItems = [];
+        foreach ($dataItems as $dataItem) {
+            $sku = $dataItem['sku'];
+            if (empty($mergedItems[$sku])) {
+                $mergedItems[$sku] = $dataItem;
+            } else {
+                foreach ($dataItem as $key => $value) {
+                    if (is_array($value)) {
+                        $mergedItems[$sku][$key] = array_merge($mergedItems[$sku][$key], $value);
+                        $mergedItems[$sku][$key] = array_unique($mergedItems[$sku][$key]);
+                    } else {
+                        $mergedItems[$sku][$key] = $value;
+                    }
+                }
+            }
+        }
+        $dataItems = array_values($mergedItems);
+        
         $now = new DateTime();
         
         $importDir = implode(DIRECTORY_SEPARATOR, [

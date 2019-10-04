@@ -735,13 +735,25 @@ class Thespace_ImportExport_Helper_ProductParser extends Mage_Core_Helper_Abstra
         foreach ($combinations as $combination) {
             $index++;
             
-            $combinationSku = sprintf("%s-%s", $sku, $slugHelper->getSlug(implode("-", $combination)));
+            $combinationName = [];
+            for ($i = 0; $i < count($combination); $i++) {
+                $combinationName[] = ucwords(str_replace("_", " ", $rowAttributeCodes[$i]));
+                $combinationName[] = $combination[$i];
+            }
+            
+            $combinationSku = sprintf("%s-%s", $sku, $slugHelper->getSlug(implode("-", $combinationName)));
             
             $item = array_merge($row, [
-                'sku'   => $combinationSku,
-                'name'  => sprintf("%s-%s", $name, implode("-", $combination)),
-                '_type' => 'simple',
+                'sku'        => $combinationSku,
+                'name'       => sprintf("%s %s", $name, implode(" ", $combinationName)),
+                '_type'      => 'simple',
+                'visibility' => 1,
             ]);
+            
+            unset($item['variation_attributes']);
+            foreach ($rowAttributeCodes as $code) {
+                unset($item[$code]);
+            }
             
             foreach ($combination as $key => $value) {
                 $item[$rowAttributeCodes[$key]] = $value;
@@ -754,19 +766,19 @@ class Thespace_ImportExport_Helper_ProductParser extends Mage_Core_Helper_Abstra
                     $item['_attribute_set'] = $parentItem['_attribute_set'];
                 }
             }
-            
-            if (empty($item['_product_websites'])) {
-                $item['_product_websites'] = [];
-                
-                if ($parentProduct) {
-                    foreach ($parentProduct->getWebsiteIds() as $websiteId) {
-                        $websiteCode = Mage::getModel('core/website')->load($websiteId)->getData("code");
-                        $item['_product_websites'][] = $websiteCode;
-                    }
-                } else {
-                    $item['_product_websites'][] = $parentItem['_product_websites'];
-                }
-            }
+
+//            if (empty($item['_product_websites'])) {
+//                $item['_product_websites'] = [];
+//
+//                if ($parentProduct) {
+//                    foreach ($parentProduct->getWebsiteIds() as $websiteId) {
+//                        $websiteCode = Mage::getModel('core/website')->load($websiteId)->getData("code");
+//                        $item['_product_websites'][] = $websiteCode;
+//                    }
+//                } else {
+//                    $item['_product_websites'][] = $parentItem['_product_websites'];
+//                }
+//            }
             
             if (empty($item['tax_class_id'])) {
                 
