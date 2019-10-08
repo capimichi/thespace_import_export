@@ -24,9 +24,12 @@ class Thespace_ImportExport_ConfigurableController extends Mage_Adminhtml_Contro
             'errors' => [],
         ];
         
+        $skuHelper = Mage::helper('thespaceimportexport/Sku');
         $importHelper = Mage::helper('thespaceimportexport/Import');
         $csvHelper = Mage::helper('thespaceimportexport/Csv');
         $productParserHelper = Mage::helper('thespaceimportexport/ProductParser');
+        
+        $existingSkus = $skuHelper->getExistingSkus();
         
         $filePath = $_POST['file'];
         
@@ -47,8 +50,9 @@ class Thespace_ImportExport_ConfigurableController extends Mage_Adminhtml_Contro
             } else {
                 foreach ($dataItem as $key => $value) {
                     if (is_array($value)) {
-                        $mergedItems[$sku][$key] = array_merge($mergedItems[$sku][$key], $value);
-                        $mergedItems[$sku][$key] = array_unique($mergedItems[$sku][$key]);
+                        $mergedItems[$sku][$key] = array_merge($mergedItems[$sku][$key], array_values($value));
+//                        $mergedItems[$sku][$key] = array_unique($mergedItems[$sku][$key]);
+                        $mergedItems[$sku][$key] = array_values($mergedItems[$sku][$key]);
                     } else {
                         $mergedItems[$sku][$key] = $value;
                     }
@@ -64,13 +68,15 @@ class Thespace_ImportExport_ConfigurableController extends Mage_Adminhtml_Contro
         $index = 0;
         foreach ($dataGroups as $dataGroup) {
             
-            $univokeDataGroup = [];
-            foreach ($dataGroup as $dataGroupItem) {
-                $sku = $dataGroupItem['sku'];
-                $univokeDataGroup[$sku] = $dataGroupItem;
+            $clearImagesGroup = [];
+            foreach ($dataGroup as $dataItem) {
+                if ($dataItems['type'] == 'simple') {
+                    $clearImagesGroup[] = $dataItem;
+                }
             }
-            $dataGroup = array_values($univokeDataGroup);
             
+            $productParserHelper->clearImages($clearImagesGroup, $existingSkus);
+            $dataGroup = $productParserHelper->parseImages($dataGroup);
             $dataGroup = $productParserHelper->parseArrayCells($dataGroup);
             
             try {

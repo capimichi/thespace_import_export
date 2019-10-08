@@ -52,6 +52,8 @@ class Thespace_ImportExport_Helper_ProductParser extends Mage_Core_Helper_Abstra
         'image'               => [
             'image',
             'images',
+            'immagine',
+            'immagini',
         ],
         'small_image'         => 'small_image',
         'thumbnail'           => 'thumbnail',
