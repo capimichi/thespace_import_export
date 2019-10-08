@@ -57,26 +57,6 @@ class Thespace_ImportExport_ConfigurableController extends Mage_Adminhtml_Contro
         }
         $dataItems = array_values($mergedItems);
         
-        $now = new DateTime();
-        
-        $importDir = implode(DIRECTORY_SEPARATOR, [
-                \Mage::getBaseDir('media'),
-                "thespace-import-export",
-                "bulk-configurable",
-                $now->format('Y'),
-                $now->format('m'),
-                $now->format('d'),
-            ]) . DIRECTORY_SEPARATOR;
-        if (!file_exists($importDir)) {
-            mkdir($importDir, 0777, true);
-        }
-        $importFile = implode(DIRECTORY_SEPARATOR, [
-            $importDir,
-            $now->format('Y-m-d-H-i-s') . ".json",
-        ]);
-        
-        file_put_contents($importFile, json_encode($dataItems));
-        
         $dataGroups = $importHelper->groupImportItems($dataItems, 500);
         
         $import = Mage::getModel('fastsimpleimport/import');

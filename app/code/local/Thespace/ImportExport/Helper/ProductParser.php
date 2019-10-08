@@ -675,6 +675,11 @@ class Thespace_ImportExport_Helper_ProductParser extends Mage_Core_Helper_Abstra
         if (!is_array($rowAttributeCodes)) {
             $rowAttributeCodes = [$rowAttributeCodes];
         }
+        $rowAttributeIds = [];
+        foreach ($rowAttributeCodes as $rowAttributeCode) {
+            $rowAttributeIds[] = Mage::getResourceModel('eav/entity_attribute')
+                ->getIdByCode('catalog_product', $rowAttributeCode);
+        }
         
         $attributeValueGroups = [];
         
@@ -737,11 +742,14 @@ class Thespace_ImportExport_Helper_ProductParser extends Mage_Core_Helper_Abstra
             
             $combinationName = [];
             for ($i = 0; $i < count($combination); $i++) {
-                $combinationName[] = ucwords(str_replace("_", " ", $rowAttributeCodes[$i]));
-                $combinationName[] = $combination[$i];
+                $combinationName[] = ucwords(str_replace("_", " ", $rowAttributeIds[$i]));
+//                $combinationName[] = $combination[$i];
+                $combinationAttribute = Mage::getModel('eav/config')->getAttribute('catalog_product', $rowAttributeCodes[$i]);
+                $combinationId = $combinationAttribute->getSource()->getOptionId($combination[$i]);
+                $combinationName[] = $combinationId;
             }
             
-            $combinationSku = sprintf("%s-%s", $sku, $slugHelper->getSlug(implode("-", $combinationName)));
+            $combinationSku = strtolower(sprintf("%s-%s", $sku, $slugHelper->getSlug(implode("-", $combinationName))));
             
             $item = array_merge($row, [
                 'sku'        => $combinationSku,
