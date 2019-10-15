@@ -134,6 +134,12 @@ class Thespace_ImportExport_Helper_ProductParser extends Mage_Core_Helper_Abstra
             'gestisci_scorte',
             'gestisci_quantita',
         ],
+        'backorders'              => [
+            'backorders',
+        ],
+        'use_config_backorders'   => [
+            'use_config_backorders',
+        ],
         'use_config_manage_stock' => 'use_config_manage_stock',
         'tax_class_id'            => [
             'tax_class_id',
