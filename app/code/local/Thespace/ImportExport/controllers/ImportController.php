@@ -245,9 +245,11 @@ class Thespace_ImportExport_ImportController extends Mage_Adminhtml_Controller_A
         ];
         
         $importHelper = Mage::helper('thespaceimportexport/Import');
+        $bulkHelper = Mage::helper('thespaceimportexport/Bulk');
         $csvHelper = Mage::helper('thespaceimportexport/Csv');
         $skuHelper = Mage::helper('thespaceimportexport/Sku');
         $productParserHelper = Mage::helper('thespaceimportexport/ProductParser');
+        $categoryParserHelper = Mage::helper('thespaceimportexport/CategoryParser');
         
         $groupIndex = $_POST['group'];
         $response['group'] = $groupIndex;
@@ -255,6 +257,12 @@ class Thespace_ImportExport_ImportController extends Mage_Adminhtml_Controller_A
         $response['file'] = $filePath;
         $dataGroup = json_decode(file_get_contents($filePath), true);
         $imageReplace = !empty($_POST['image_replace']);
+        $categoryReplace = !empty($_POST['category_replace']);
+        
+        if (!$categoryReplace) {
+            $categoryNames = $categoryParserHelper->categoryNames();
+            $categoryPaths = $categoryParserHelper->categoryPaths();
+        }
 
 //        $dataItems = $productParserHelper->getDataFromRows($csvHelper->getRows($filePath));
 //        $dataItems = $productParserHelper->applyParentCells($dataItems);
@@ -271,6 +279,11 @@ class Thespace_ImportExport_ImportController extends Mage_Adminhtml_Controller_A
             if ($imageReplace) {
                 $existingSkus = $skuHelper->getExistingSkus();
                 $productParserHelper->clearImages($dataGroup, $existingSkus);
+            }
+            
+            if (!$categoryReplace) {
+                $skuCategories = $bulkHelper->getSkuCategories();
+                $dataGroup = $productParserHelper->applyCategories($dataGroup, $skuCategories, $categoryNames, $categoryPaths);
             }
             
             $dataGroup = $productParserHelper->parseArrayCells($dataGroup);

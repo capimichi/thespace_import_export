@@ -46,12 +46,31 @@ class Thespace_ImportExport_Helper_CategoryParser extends Mage_Core_Helper_Abstr
     public function categoryNames()
     {
         $categories = Mage::getModel('catalog/category')->getCollection()
-            ->addAttributeToSelect('*');
+            ->addAttributeToSelect('name');
         
         $categoryNames = [];
         foreach ($categories as $category) {
 //            $categoryNames[$category->getId()] = str_replace("/", "\/", $category->getName());
             $categoryNames[$category->getId()] = $category->getName();
+        }
+        
+        return $categoryNames;
+    }
+    
+    /**
+     * @author Michele Capicchioni <capimichi@gmail.com>
+     *
+     * @return array
+     */
+    public function categoryPaths()
+    {
+        $categories = Mage::getModel('catalog/category')->getCollection()
+            ->addAttributeToSelect('path');
+        
+        $categoryNames = [];
+        foreach ($categories as $category) {
+//            $categoryNames[$category->getId()] = str_replace("/", "\/", $category->getName());
+            $categoryNames[$category->getId()] = $category->getPath();
         }
         
         return $categoryNames;
@@ -71,6 +90,24 @@ class Thespace_ImportExport_Helper_CategoryParser extends Mage_Core_Helper_Abstr
                 $item = $categoryNames[$item];
             }
             return $item;
+        }, $path);
+        
+        $path = implode("/", $path);
+        
+        return $path;
+    }
+    
+    public function getCategoryPathNameById($categoryId, $categoryNames, $categoryPaths)
+    {
+        $path = $categoryPaths[$categoryId];
+        $path = explode('/', $path);
+        array_shift($path);
+        
+        $path = array_map(function ($item) use ($categoryNames) {
+            if (isset($categoryNames[$item])) {
+                return $categoryNames[$item];
+            }
+            return '';
         }, $path);
         
         $path = implode("/", $path);
