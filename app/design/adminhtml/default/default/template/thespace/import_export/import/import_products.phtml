@@ -166,7 +166,8 @@
                         var groupFiles = response.files;
 
                         importGroups(groupFiles, 0, {
-                            formData: formData,
+                            imageReplace: $j("#image_replace").is(":checked"),
+                            categoryReplace: $j("#category_replace").is(":checked"),
                             onProcess: function (response, index) {
 
                                 $j.each(response.errors, function (k, error) {
@@ -224,18 +225,13 @@
 
                 var group = groups[index];
 
-                var formData = options.formData;
-                formData.file = group;
-                formData.group = index;
-
                 $j.ajax({
                     url: globals.urlImportRun,
                     method: 'post',
                     data: {
                         file: group,
                         group: index,
-                        image_replace: formData.image_replace,
-                        category_replace: formData.category_replace,
+                        category_replace: options.categoryReplace
                     },
                     // processData: false,
                     // cache: false,
