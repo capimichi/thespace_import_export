@@ -231,7 +231,12 @@
                 $j.ajax({
                     url: globals.urlImportRun,
                     method: 'post',
-                    data: formData,
+                    data: {
+                        file: group,
+                        group: index,
+                        image_replace: formData.image_replace,
+                        category_replace: formData.category_replace,
+                    },
                     // processData: false,
                     // cache: false,
                     // contentType: false,
