@@ -43,7 +43,7 @@
         </p>
         <p>
             <label> Sostituzione categorie <input id="category_replace" type="checkbox" value="1"
-                                                 name="category_replace"></label>
+                                                  name="category_replace"></label>
         </p>
         <!--        <p>-->
         <!--            <label> Gestione avanzata immagini <input type="checkbox" value="1" name="image_advanced"></label>-->
@@ -166,6 +166,7 @@
                         var groupFiles = response.files;
 
                         importGroups(groupFiles, 0, {
+                            formData: formData,
                             onProcess: function (response, index) {
 
                                 $j.each(response.errors, function (k, error) {
@@ -223,13 +224,14 @@
 
                 var group = groups[index];
 
+                var formData = options.formData;
+                formData.file = group;
+                formData.group = index;
+
                 $j.ajax({
                     url: globals.urlImportRun,
                     method: 'post',
-                    data: {
-                        file: group,
-                        group: index,
-                    },
+                    data: formData,
                     // processData: false,
                     // cache: false,
                     // contentType: false,
