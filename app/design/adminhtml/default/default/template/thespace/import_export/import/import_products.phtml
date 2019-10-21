@@ -166,8 +166,8 @@
                         var groupFiles = response.files;
 
                         importGroups(groupFiles, 0, {
-                            imageReplace: $j("#image_replace").is(":checked"),
-                            categoryReplace: $j("#category_replace").is(":checked"),
+                            imageReplace: $j("#image_replace").is(":checked") ? 1 : 0,
+                            categoryReplace: $j("#category_replace").is(":checked") ? 1 : 0,
                             onProcess: function (response, index) {
 
                                 $j.each(response.errors, function (k, error) {
