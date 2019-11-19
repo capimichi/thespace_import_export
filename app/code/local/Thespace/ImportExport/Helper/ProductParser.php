@@ -778,6 +778,10 @@ class Thespace_ImportExport_Helper_ProductParser extends Mage_Core_Helper_Abstra
         foreach ($combinations as $combination) {
             $index++;
             
+            if (!is_array($combination)) {
+                $combination = [$combination];
+            }
+            
             $combinationName = [];
             for ($i = 0; $i < count($combination); $i++) {
                 $combinationName[] = ucwords(str_replace("_", " ", $rowAttributeIds[$i]));
