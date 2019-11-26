@@ -795,7 +795,7 @@ class Thespace_ImportExport_Helper_ProductParser extends Mage_Core_Helper_Abstra
             
             $item = array_merge($row, [
                 'sku'        => $combinationSku,
-                'name'       => sprintf("%s %s", $name, implode(" ", $combinationName)),
+                'name'       => $name,
                 '_type'      => 'simple',
                 'visibility' => 1,
             ]);
