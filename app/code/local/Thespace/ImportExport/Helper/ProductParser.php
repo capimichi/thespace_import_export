@@ -817,18 +817,18 @@ class Thespace_ImportExport_Helper_ProductParser extends Mage_Core_Helper_Abstra
                 }
             }
 
-//            if (empty($item['_product_websites'])) {
-//                $item['_product_websites'] = [];
-//
-//                if ($parentProduct) {
-//                    foreach ($parentProduct->getWebsiteIds() as $websiteId) {
-//                        $websiteCode = Mage::getModel('core/website')->load($websiteId)->getData("code");
-//                        $item['_product_websites'][] = $websiteCode;
-//                    }
-//                } else {
-//                    $item['_product_websites'][] = $parentItem['_product_websites'];
-//                }
-//            }
+            if (empty($item['_product_websites'])) {
+                $item['_product_websites'] = [];
+
+                if ($parentProduct) {
+                    foreach ($parentProduct->getWebsiteIds() as $websiteId) {
+                        $websiteCode = Mage::getModel('core/website')->load($websiteId)->getData("code");
+                        $item['_product_websites'][] = $websiteCode;
+                    }
+                } else {
+                    $item['_product_websites'][] = $parentItem['_product_websites'];
+                }
+            }
             
             if (empty($item['tax_class_id'])) {
                 
